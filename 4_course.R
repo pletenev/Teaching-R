@@ -243,11 +243,26 @@ A[A %in% B[B!= "k"]]
 #с предшествующим ему нечетным числом делится на 3
 
 ###################################День 2###############################################
-rm(list=ls()) #удаление всех объектов
-
-
-
-
+rm(list=ls()) #удаление всех объектов из памяти
+#####добавка про вектора
+#####с помощью subseting можно менять значения нужных вам элементов вектора
+a<-seq(0,100000,length.out = 51) 
+a[5]<-5000 #изменили 5 по порядку элемент
+a[a>90000]<-0 #обнулили все кто больше 90000
+a
+####можно subseting с обоих сторон
+a[seq(1, length(a), by=2)]<-a[seq(2, length(a), by=2)] #я хотел все значения нечетных элементов заменить 
+#значениями стоящих рядом четных элементов, но длинна векторов оказалась неодинаковая
+length(a[seq(1, length(a), by=2)])
+length(a[seq(2, length(a), by=2)])
+a[seq(3, length(a), by=2)]<-a[seq(2, length(a), by=2)] #смогли, только 1 элемент остался неизмененным
+a
+a[(length(a)-3):length(a)]<-mean(a[1:(length(a)-4)]) #заменил последние 4 элемента (нули) средним от остальных элементов
+a
+#####добавить элемент в конец вектора
+a[length(a)+1]<-100000
+a[67]<-7 #у нас было в a всего 52 элемента, а мы сразу добавили 67, поэтому между 53-66: NA 
+a
 
 #############Класс Data.frame#################
 #Это совокупность векторов одной длинны - фактически это Таблица с данными
@@ -258,7 +273,7 @@ currency.fx<-data.frame(eur=c(75.5481, 75.5541, 75.3861,	74.6312, 75.1932),
 currency.fx  
 class(currency.fx)
 View(currency.fx) #очень полезна если таблица большая
-str(currency.fx)
+str(currency.fx) #структура объекта
 summary(currency.fx)
 nrow(currency.fx) #кол-во рядов
 ncol(currency.fx) #кол-во колонок
@@ -279,10 +294,13 @@ max(currency.fx)
 ##########subseting data.frame
 ###1 способ - работает только с колонками (переменными) 
 currency.fx$uah #вытаскивает переменную
+
+#создание новой колонки
 currency.fx$date<-c("m","t","w","th","fr","sa") #длинна вектора больше чем у data.frame
-currency.fx$date<-c("m","t","w","th","fr") #длины не совпадают
+currency.fx$date<-c("m","t","w","th","fr") # а здесь все ок - длина совпадает
 4*currency.fx #уже нельзя так как один столбец это character
 currency.fx$eu<-currency.fx$eur/currency.fx$usd
+
 currency.fx$eur [1:3] #так как это обычный вектор, то его можно тоже subset - см. разделы про вектора 
 currency.fx$eur[currency.fx$eur<75.5]
 currency.fx$eur[eur<75.5] #ошибка, так как объекта eur нет, а есть объект  currency.fx$eur
@@ -291,13 +309,13 @@ currency.fx$eur[currency.fx$usd>66&currency.fx$uah<23.8]
 currency.fx$eur[currency.fx$date=="m"]<-77.4 #мы переписали данные у этого вектора для понедельника
 
 ###2 способ -универсальный
-## 2а - порядковые номера или TRUE/FALSE - как subsetting у векторов
+## 2а - порядковые номера или TRUE/FALSE - как subsetting у векторов, НО - два измерения (строки/столбцы)
 currency.fx[2,5] #вторая строка, 5-я колонка
 currency.fx[2:4,4:5]
 currency.fx[c(1,5), c(2,4)]
 currency.fx[nrow(currency.fx),ncol(currency.fx)-1] #предпоследний элемент data.frame
 
-#пропущенное i или j означает все ряды или колонки 
+#пустое место на месте i или j означает выбор всех рядов или колонок 
 currency.fx[2,] #второй ряд и все колонки  (весь второй ряд)
 currency.fx[,c(1,5)] #первая и 5-я колонки
 currency.fx[,3] #аналогично currency.fx$uah
@@ -307,23 +325,21 @@ currency.fx[-1,] #без первого ряда
 
 #условия
 currency.fx[currency.fx$usd>66,] #условие почти всегда используется для рядов
-currency.fx[usd>66,] #опять же объекта usd нет а есть currency.fx$usd
+currency.fx[usd>66,] #объекта usd нет а есть currency.fx$usd
 currency.fx[currency.fx$usd>66|currency.fx$date=="m", names(currency.fx)!="usd"] #полезное условие для колонок придумать сложнее, но можно
 currency.fx[currency.fx$date=="t",1:3]<-round(currency.fx[currency.fx$date=="t",1:3],1) #мы переписали данные, округлив их до первого знака
-currency.fx[currency.fx$usd==max(currency.fx$usd),"date"] #дата, когда курс доллара был максимален
-
-
+currency.fx[currency.fx$usd==max(currency.fx$usd),5] #дата, когда курс доллара был максимален
 
 #subseting можно делать несколько раз подряд
-currency.NA<-currency.fx[currency.fx$usd>66,] [1:3,] [,1:2] 
+currency.NA<-currency.fx[currency.fx$usd>66,] [1:3,] [2:5,1:2] 
 currency.NA
-#NA -missing values он выдал, так как после первого условия у нас оставалось 2 строчки, а я во втором subsetting выбрал три
+#NA -missing values он выдал, так как после первого условия у нас оставалось 2 строчки, а я во втором subsetting выбрал четыре строчки
 is.na(currency.NA) #проверка на NA
-currency.NA[!is.na(currency.NA$eur)&!is.na(currency.NA$usd),] #удаление строчки в которой есть NA
+currency.NA[!is.na(currency.NA$eur)&!is.na(currency.NA$usd),] #исключение строчек в которой есть NA
 
-currency.NULL<-NULL #таким образом мы обнулили объект, NULL часто появляется, когда на выходe получается пустой объект  
-class(currency.NULL)
-is.null(currency.NULL)
+currency.NA<-NULL #таким образом мы обнулили (опустошили) объект, NULL часто появляется, когда на выходe функции получается пустой объект  
+class(currency.NA)
+is.null(currency.NA)
 
 ####2b название колонок/рядов
 currency.fx[,"uah"] #аналогично currency.fx$uah
@@ -332,18 +348,19 @@ a<-"usd"
 currency.fx[,a] #а вот так можно
 currency.fx[,c("date","uah")]
 currency.fx[c("a","c"),c("date","uah")] 
-currency.fx[,-c("date","uah")] #минус не работает с названиями
+currency.fx[,-c("date","uah")] #минус не работает с названиями колонок, только с их порядковыми номерами
 currency.fx[,!names(currency.fx) %in% c("date","uah")] #можно так
 
-currency.uah <- currency.fx[,c("date","uah")] #не забываем что во всех приведеннх случаях, 
+currency.uah <- currency.fx[,c("date","uah")] #не забываем что во всех приведенных вышк случаях, 
 #все что выведено на экран можно вместо этого записать как новый объект
 currency.uah 
 
 #####третий вариант - специальные функции для subseting
-head(currency.fx, n=5) #первые 5 рядов - аналогично currency.fx[1:5,]
+head(currency.fx, n=3) #первые 3 ряда - аналогично currency.fx[1:3,]
 tail(currency.fx, n=2) # последние 2 ряда - аналогично currency.fx[(nrow(currency.fx)-1):nrow(currency.fx),]
+head(currency.fx$usd, n=3) #для векторов тоже работает
 
-subset(currency.fx, ("usd"<66.5&eur>75.2)| date=="t") #здесь название колонок можно БЕЗ КАВЫЧЕК (исключение из правила)
+subset(currency.fx, (usd<66.5&eur>75.2)| date=="t") #здесь название колонок БЕЗ КАВЫЧЕК (исключение из правила)
 #subset полезен если у тебя множественное сравнение, экономит место, так как не надо каждый раз писать название
 # data.frame - сравните аналог 
 currency.fx[(currency.fx$usd<66.5&currency.fx$eur>75.2)| currency.fx$date=="t",]
@@ -358,21 +375,19 @@ currency.fx$date[(currency.fx$eur-currency.fx$usd)==max(currency.fx$eur-currency
 currency.fx$new<-with (currency.fx, (eur/uah)*usd+eu) 
 with(currency.fx, usd[usd==max(usd)])
 #удобно в сочетании с subset
-with(subset(currency.fx, usd>66), mean(eur/usd)) #средний евродоллар для ситуации когда курс доллара больше 66
+with(subset(currency.fx, usd>66), mean(eur/usd+34*uah)) #расчет для ситуации когда курс доллара больше 66
 
 
 
-#фигурные скобки позволяют выполнить несколько действий в рамках with
+#фигурные скобки позволяют выполнить несколько действий в рамках with (используется и рядом других функций)
 with(subset(currency.fx, usd>66), {
   print(mean(eur/usd))  #print - вывод на экран
   print(sd(eur/usd))
   print(max(eur/usd))
   })
 
-
-
 ####attach - отменяет необходимость писать название data.frame навсегда, пока не напишешь detach
-####количество detach должно быть равно количеству detach
+####количество detach должно быть равно количеству attach
 attach(currency.fx)
 usd/eur
 usd[usd==max(usd)]
@@ -382,7 +397,7 @@ usd/eur
 
 #эта функция опасна, так как
 # 1.названия некоторых объектов могут совпадать с названиями колонок data.frame
-#когда atach и detach далеко разнесены
+#2.когда atach и detach далеко разнесены
 date<-5
 attach(currency.fx)
 usd[date=="m"] #так как есть объект date,то он его успользует а не currency.fx$date
@@ -391,17 +406,20 @@ detach(currency.fx)
 
 ########Cливание двух датафреймов
 ###по строкам (количество колонок должно быть равно)
-currency.fx<-rbind(currency.fx, data.frame(eur=c(76.5481, 77.5541),usd=c(66.6499, 66.4318), date=c("m","t"),
-                                           uah=c(23,24), eu=c(76.5481, 77.5541)/c(66.6499, 66.4318)))
+currency.new<-data.frame(eur=c(76.5481, 77.5541),usd=c(66.6499, 66.4318), date=c("m","t"),
+               uah=c(23,24), eu=c(76.5481, 77.5541)/c(66.6499, 66.4318), new=NA)
+currency.fx<-rbind(currency.fx, currency.new)
+
+
 ###по колонкам (количество строк долно быть равно)
 holidays_time<-data.frame(holidays=c(rep("w",5), "h","h"), time=c(10:16))
 currency<-cbind(currency.fx,holidays_time)
 
 
 ########## Задача - узнать делители числа
-a<-873
+a<-11873
 del<-data.frame(del=1:a, result=a/(1:a))
-del[(del$result-round(del$result))==0,]$del
+del[(del$result-round(del$result))==0,]$del #функция round округляет до указанного порядка (по умолчанию до целого)
 
 
 #################Задание в классе 2###########################
