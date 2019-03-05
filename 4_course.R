@@ -250,6 +250,7 @@ a<-seq(0,100000,length.out = 51) #51 элемент
 a[5]<-5000 #изменили 5 по порядку элемент
 a[a>90000]<-0 #обнулили все кто больше 90000
 a
+
 ####можно subseting с обоих сторон
 #a[seq(1, length(a), by=2)]<-a[seq(2, length(a), by=2)] #я хотел все значения нечетных элементов заменить 
 #значениями стоящих рядом четных элементов, но длинна векторов оказалась неодинаковая
@@ -263,6 +264,7 @@ a
 a[length(a)+1]<-100000
 a[67]<-7 
 #у нас было в a всего 52 элемента, а мы сразу добавили 67, поэтому между 53-66: NA 
+
 a<-c(a[1:59],79,a[60:67])
 
 ####минизадание - присвойте 5-ому,10-ому и 13-ому элементам вектора a значения 3, 56, 77.5 
@@ -307,7 +309,7 @@ currency.fx$date<-c("m","t","w","th","fr") # а здесь все ок - длина совпадает
 #4*currency.fx #уже нельзя так как один столбец это character
 currency.fx$eu<-currency.fx$eur/currency.fx$usd
 
-currency.fx$eur [1:3] #так как это обычный вектор, то его можно тоже subset - см. разделы про вектора 
+currency.fx$eur[1:3] #так как это обычный вектор, то его можно тоже subset - см. разделы про вектора 
 currency.fx$eur[currency.fx$eur<75.5]
 currency.fx$eur[eur<75.5] #ошибка, так как объекта eur нет, а есть объект  currency.fx$eur
 currency.fx$eur[currency.fx$usd>66] #выводятся те курсы евро, когда доллар был выше 66 рублей 
@@ -343,7 +345,7 @@ currency.fx[currency.fx$usd==max(currency.fx$usd),4] #дата, когда курс доллара б
 #currency.fx[currency.fx$usd==max(currency.fx$usd),]
 
 #subseting можно делать несколько раз подряд
-currency.NA<-currency.fx[currency.fx$usd>65.4,] [1:2,] 
+currency.NA<-currency.fx[currency.fx$usd>65.95,] [1:2,] 
 #currency.NA
 #NA -missing values он выдал, так как после первого условия у нас оставалось 2 строчки, а я во втором subsetting выбрал четыре строчки
 #is.na(currency.NA) #проверка на NA
@@ -358,8 +360,8 @@ currency.fx[currency.fx$usd==65.9300,5]<-NA
 
 ######минизадание создать data.frame currency.hr в котором будут все данные currency.fx кроме тех, 
 #где uah равен 23.9000 или 23.6641
-
-
+currency.hr<-currency.fx[!currency.fx$uah %in% c(23.9000,23.6641),]
+currency.hr<-currency.fx[!(currency.fx$uah==23.9|currency.fx$uah==23.6641)]
 ####2b название колонок/рядов
 currency.fx[,"uah"] #аналогично currency.fx$uah
 currency.fx[,usd] #не забывайте КАВЫЧКИ - а то R думает что это название объекта
@@ -375,14 +377,15 @@ currency.uah <- currency.fx[,c("date","uah")] #не забываем что во всех приведенн
 #все что выведено на экран можно вместо этого записать как новый объект
 #currency.uah 
 
-######минизадание: вывести на экран данные currency.fx для колонок "usd","hryvna" 
+######минизадание: вывести на экран данные currency.fx для колонок "usd","uah" 
 #для случая когда eu больше 1.135
+currency.fx[currency.fx$eu>1.135,c("usd","uah")]
 
 
 #####третий вариант - специальные функции для subseting
 head(currency.fx, n=3) #первые 3 ряда - аналогично currency.fx[1:3,]
 tail(currency.fx, n=2) # последние 2 ряда - аналогично currency.fx[(nrow(currency.fx)-1):nrow(currency.fx),]
-head(currency.fx$usd, n=3) #для векторов тоже работает
+head(hryvna, n=3) #для векторов тоже работает
 
 #subsetting по рядам
 subset(currency.fx, (usd<66.5&eur>75.2)| date=="t") #здесь название колонок БЕЗ КАВЫЧЕК (исключение из правила)
@@ -391,10 +394,10 @@ subset(currency.fx, (usd<66.5&eur>75.2)| date=="t") #здесь название колонок БЕЗ 
 currency.fx[(currency.fx$usd<66.5&currency.fx$eur>75.2)| currency.fx$date=="t",]
 
 ####нельзя subset, head, tail слева от знака присваивания (поэтому слева только [])
-subset(currency.fx, (usd<66.5) <- 0 #ошибка
+subset(currency.fx, usd<66.5) <- 0 #ошибка
 
 #последовательный subsetting
-subset(currency.fx, usd>65.8)$usd # курс доллара для случаев когда курс был больше 66
+subset(currency.fx, usd>65.8)$usd [1:3] # курс доллара для случаев когда курс был больше 66
 
 subset(currency.fx, (eur-usd)==max(eur-usd))$date #дата когда разница между курсами была максимальной
 
@@ -403,7 +406,7 @@ currency.fx$date[(currency.fx$eur-currency.fx$usd)==max(currency.fx$eur-currency
 
 ###минизадание: с помощью subset выведете на экран данные (ряд) 
 #из currency.fx когда курс евро был максимальным
-
+subset(currency.fx, eur==max(eur))
 
 
 #######ещё полезные функции чтобы не писать все время название data.frame (не )
@@ -451,15 +454,15 @@ detach(currency.fx)
 currency.new<-data.frame(eur=c(76.5481, 77.5541),usd=c(66.6499, 66.4318), date=c("m","t"),
                uah=c(23,24), eu=c(76.5481, 77.5541)/c(66.6499, 66.4318), new=NA)
 currency.fx<-rbind(currency.fx, currency.new) #raw bind - слияние по рядам
-
-
+currency.fx[nrow(currency.fx)+1,]<-currency.fx[1,]
+currency.fx$ffg<-1
 ###по колонкам (количество строк долно быть равно)
 holidays_time<-data.frame(holidays=c(rep("w",5), "h","h"), time=c(10:16))
 currency<-cbind(currency.fx,holidays_time) #column bind
 
 
 ########## Задача - узнать делители числа
-a<-11873
+a<-11870
 del<-data.frame(del=1:a, result=a/(1:a))
 del[(del$result-round(del$result))==0,]$del #функция round округляет до указанного порядка (по умолчанию до целого)
 del[(del$result-round(del$result))==0,1]
@@ -467,6 +470,7 @@ del[(del$result-round(del$result))==0,1]
 #################Задание в классе 2###########################
 data_chick<-ChickWeight #ChickWeight - это одна из предустановленных (built-in) data.frame: вес,возраст,номер цыпленка, номер диеты
 str(data_chick)
+data_chick$Chick
 #1. выберите  данные по цыплятам 13-18 и запишите в датафрейм chick_13_18. 
 #Далее в заданиях используйте этот дата фрейм chick_13_18
 
@@ -505,10 +509,70 @@ summary(data_chick)
 #7. максимальный (с точки зрения порядка факторов) номер (Chick) цыпленка у которого вес в каком-либо из 
 #возрастов был больше 200, но при этом вес при рождении (Time 0) был меньше 40
 
+################день 3######################################
+rm(list=ls()) #удаление всех объектов из памяти
+
+############Загрузка и выгрузка данных#####################
+setwd("C:/R/Teaching/Data") #set working directory - установка папки по умолчанию
+#Обратите внимание, что здесь не прямой (как в Windows), а обратный слеш, так как прямой используется как знак деления
+
+#другой способ - использовать двойной прямой слеш
+setwd("C:\\R\\Teaching\\Data")
+
+#при загрузке или выгрузки данных, если путь к файлу не указан, то используется путь к папке по умолчанию 
+
+###загрузка csv, функция read.csv2 используется для загрузки csv "российского формата" (где разделители между колонками точки с запятой)
+films<-read.csv2(file="film.csv", dec=".", stringsAsFactors = FALSE)
+#параметр dec - кокой знак отделяет целые от десятичных, если у вас запятая, то надо использовать ","  
+# stringsAsFactors - воспринимать ли строковые переменные как факторы
+str(films)
+
+#другой вариант, прописать все классы переменных вручную с помощью параметра colClasses
+films<-read.csv2(file="film.csv", dec=".", 
+  colClasses = c("integer", "integer", "character", "factor",rep("character",3),"integer","factor"))
+
+str(films)
+
+#создает новый data.frame только из комедий с наградами
+comedies<-films[films$Subject=="Comedy"&films$Awards=="Yes", ]
+
+#теперь выгружаем (сохраняем) новую data.frame на диск
+write.csv2(comedies, file="Comedies with awards.csv")
+
+########сохранение объекта для дальнейшего использования в R
+#мы хотим сохранить объект films, чтобы заново не загружать его из csv
+##команда dput
+dput(films, file="all films")
+
+rm(list=ls()) #удаление всех объектов из памяти
+
+#dget загружает объект
+dget(file="all films")
+
+#чтобы загрузить объект надо использовать знак присвоения
+films.all<- dget(file="all films")
+
+###альтернативный способ - функции save/load. можно сразу несколько объектов, а также сложные объекты
+#которые dget/dput не берет
+levels(films.all$Subject)
+fantasy<-films.all[films.all$Subject=="fantasy",]
+popular<-films.all[films.all$Popularity>60,]
+save(list=c("fantasy","popular"), file="fantasy_and_popular")
+
+rm(list=ls()) #удаление всех объектов из памяти
+
+load(file="fantasy_and_popular") #сразу загружает в global environment, знак присвоения не нужен
+
+##############Задание в классе
+#сохранить данные из Excel в csv(разделитель запятые), загрузить свои данные в R, 
+#сделать какой-то subseting - сохранить его в csv и как объект R,
+#удалить все данные из R и загрузить снова в R этот subsetting
+
+
 #########классы матрицы, таблицы, list#############
 
 ######класс матрица - столбы и строки эквивалентны 
-mat<-matrix(data = c(1:600), nrow = 30, ncol = 20) #из вектора делается  
+mat<-matrix(data = c(1:600), nrow = 30, ncol = 20) #из вектора делается, фактически это вектор уложенный определенным образом  
 class(mat)
 colnames(mat)<-letters[1:20]
 rownames(mat)<-LETTERS[1:30]
@@ -522,17 +586,15 @@ mat[mat>50] #выдает вектор
 
 ##операции с матрицами
 t(mat) #транспонирование
-data_chick<-ChickWeight
-str(t(data_chick)) # с data.frame тоже можно, но результатом будет вектор
 
 ####как переделать data.frame в матрицу и наоборот - 
-data_chick.mat<-data.matrix(data_chick) #data.matrix из data.frame в  matrix
+data_chick<-ChickWeight
+data_chick.mat<-data.matrix(data_chick) #data.matrix из data.frame переводит в  matrix
 class(data_chick.mat)
 str(data_chick.mat)
 
-data_chick.1<-data.frame(data_chick.mat)
+data_chick.1<-data.frame(data_chick.mat) #перевод матрицы в data.frame
 str(data_chick.1) #все перменные в data.frame стали numeric
-str(data_chick)
 
 #####класс table
 sum<-summary(data_chick)
@@ -542,9 +604,10 @@ dimnames(sum)
 sum[,1]
 
 sum1<-summary(data_chick$weight)
-str(sum1) #намного лучше
-sum1[names(sum1)=="1st Qu."]/3 #уже можно вытащить число
-sum1.data<-data.frame(t(matrix(sum1)))
+str(sum1) #намного лучше, ecnm attr - names
+names(sum1)
+sum1[names(sum1)=="1st Qu."] #уже можно вытащить число
+sum1.data<-data.frame(t(matrix(sum1))) #перевод в data.frame
 names(sum1.data)<-names(sum1)
 sum1.data
 
@@ -554,30 +617,35 @@ chick_survey<-list(data=data_chick, authors=c("Anton", "Gosha", "Petya"),
                    temperature=data.frame(year=c(2016:2018),temp=c(23,25,27)),
                    period="2016-2018", journal="Ecology", Citations=134)
 str(chick_survey)
+
 ###subseting
 chick_survey$authors
-chick_survey[[2]]
+chick_survey[[2]] # аналог, в двойный скобках только одно измерение - никаких запятых в [[]]
 chick_survey[2] #а если так то выдаст list одного элемента
 str(chick_survey[2])
-chick_survey[c(1,3)] #список из двух элементов
-chick_survey[[c(1,3)]]
-str(chick_survey[[c(1,3)]]) #не вразумительное что-то
 
-chick_survey[[1]] [1,3] #так как chick_survey[[1]] обычная матрица
+chick_survey[c(1,3)] #list из двух элементов
+chick_survey[c("data","temperature")] #то же самое
+
+#последовательный subsetting
+chick_survey[[1]] [1,3] #так как chick_survey[[1]] обычная data.frame
 chick_survey[[1]]$Time
 
 ###элементом list может быть list
+#создаем новый элемент у chick_survey
 chick_survey$reviews<-list(result="accepted", 
                            marks=data.frame(reviewers=c("Vova","Petya","Dasha"), marks=c(7,8,6)))
 str(chick_survey)
 chick_survey$reviews$result
 
 ##часто list сложные объекты, типа результат регрессии
-lm(data_chick$weight~data_chick$Time)
+lm(data_chick$weight~data_chick$Time) #lm() - функция линейной регрессии, ~ знак зависимости
 a<-lm(data_chick$weight~data_chick$Time)
 str(a) #list из 12 элементов, один из них data.frame -model
 str(a$model) #это исходные данные модели
 a$model$"data_chick$weight" #"data_chick$weight" - это название переменной, поэтому в кавычках
+
+####минизадание: вывести на экран 4-10 элемент 5-ого элемента объекта a
 
 
 #######полезные функции для работы с объектами#####
@@ -595,24 +663,29 @@ str(tab) #класс table
 tab_chik<-table(data_chick[,c("Chick","Diet","Time")])
 tab_chik #трехмерная таблица
 str(tab_chik)
-dimnames(tab_chik)[[2]] #dimnames - это list так как вектора разной длинны
+dimnames(tab_chik)[[2]] #dimnames - это "имена измерений", является list так как вектора разной длинны
 
 
 #### paste - объедининяет множество значений в одну строковую переменную
+name<-"Anna"
+age<-17
+paste(name,"is", age,"years old", sep=" ") #sep - разделитель, в нашем случае пробел
+
 with(data_chick, paste("Maximum weight was", max(weight), "brought by chicken", Chick[weight=max(weight)],
                        "with Diet", Diet[weight=max(weight)], sep=" ")) #sep - разделитель, в нашем случае пробел
 
+#####минизадание: напишите фразу "Minimum weight was reached at Time ... by chicken ..." 
+
+
 ###### arrange (функция пакета plyr) сортировка data.frame по одному или нескольким столбцам
-#install.packages("plyr") - так устанавливают пакеты - это нужно делать только один раз
-require(plyr) #так запускают пакет, который уже установлен, нужно делать каждую сессию, можно без кавычек,
+install.packages("plyr") - так устанавливают пакеты - это нужно делать только один раз
+require(plyr) #так запускают пакет, который уже установлен, нужно делать каждую сессию, можно без кавычек
+library("plyr") #аналогичная функция, но менее удобная (например нельзя без кавычек)
 
-arrange(data_chick, Chick) #кавычки у Chick можно не писать, заметьте, что Chick - ordered factor и сортируется по  levels
-levels(data_chick$Chick)
-arrange(data_chick, Chick, decreasing = TRUE) #параметр decreasing=TRUE если хочешь по убыванию
-
-arrange(data_chick, Diet, Chick) #сначала по Diet, потом по Chick (внутри каждой Diet)
-
-
+data_chick<-arrange(data_chick, Chick) #кавычки у Chick можно не писать, заметьте, что Chick - ordered factor и сортируется по  levels
+levels(data_chick$Chick) #обратите внимание сортирует согласно уровням факторной переменной
+data_chick<-arrange(data_chick, Chick, decreasing = TRUE) #параметр decreasing=TRUE если хочешь по убыванию
+data_chick<-arrange(data_chick, Diet, Chick) #сначала по Diet, потом по Chick (внутри каждой Diet)
 
 ###range - расброс - min-max
 range(data_chick$weight) 
@@ -624,27 +697,34 @@ data_chick_12$diff_weight<-c(0,diff(data_chick_12$weight)) #0 нужен так как коли
 data_chick_12
 
 #####cumsum - кумулятивная сумма
-cumsum(1:1000) 
+cumsum(1:100) 
 cumsum(data_chick_12$diff_weight)+data_chick_12$weight[1] #мы востановили вес зная приросты и начальное значение
 data_chick_12$weight
 
 ##### which.min и which.max - возвращает порядковый номер максимального или минимального элемента
 which.min(data_chick$weight)
 data_chick$Chick[which.min(data_chick$weight)] #какой цыпленок с минимальным весом
+data_chick$Chick[data_chick$weight==min(data_chick$weight)] # это аналог без использования функции - занимает больше места
 data_chick_12$Time[which.max(data_chick_12$diff_weight)] #в каком возрасте набрал максимальный вес
+
+######минизадание: в каком возрасте у цыпленка 12 была максимальная средняя скорость роста (weight/Time)
 
 ###### which возвращает порядковые номера элементов которые TRUE
 which(data_chick$weight > 200)
 mean (data_chick$Time [which(data_chick$weight > 200) -1]) #средний возраст цыпленка предшествующего возрасту когда он набрал вес больше 200
 
 ##### match возвращает порядковые номера 'элементов вектора A,которые совпадают с вектором B
+A<-seq(1,100,by=2)
+B<-seq(1,50,by=3)
+match(A,B) #порядковые номера A которые совпадают с каким-то из элементов из B
+
 ###есть две похожие data.frame которые надо по умному слить
 data_all<-data.frame(names=c("Masha", "Gosha", "Petya", "Lesha", "Genya", "Galya","Vova", "Misha"),
                      weight=c(50:57))
 data_frag<-data.frame(names=c("Galya", "Vova","Gosha", "Genya", "Misha"),
                       height=seq(160,by=3,length.out=5))
 
-#надо добавить данные data_frag в data_all
+#надо добавить данные height из data_frag в data_all
 data_all$height<-data_frag$height[match(data_all$names,data_frag$names)]
 data_all
 
@@ -652,8 +732,8 @@ data_all
 data_plant<-CO2 #данные - концентрация CO2 (conc) и сколько потребило растение
 ?CO2
 
-#1. создать list из двух элементов: (1) - data.frame в котором будут только данные по chilled  
-#растениям, (2) вектор с названиями (Plant) из первого (1) элемента, в нём каждое имя растения должно встречаться 1 раз
+#1. создать list с именем Plants_chilled из двух элементов: (1) - data.frame с именем chilled, в котором будут только данные по chilled  
+#растениям, (2) вектор Plants с названиями (Plant) из первого (1) элемента, в нём каждое имя растения должно встречаться 1 раз
 
 #2 добавить в list из первого задания элемент с одним значением character :"Mean concentration of CO2 is ..., Mean uptake is...",
 #  где в качестве ... надо вставить расчитанные значения 
@@ -662,7 +742,7 @@ data_plant<-CO2 #данные - концентрация CO2 (conc) и сколько потребило растение
 
 #4. вывести таблицу с количеством случаев chilled и nonchilled в data_plant.
 
-#5. Найти имя растения (Plant) у которого был минимальный uptake в nonchilled состоянии
+#5. Найти имя растения (Plant) у которого был минимальный uptake в nonchilled состоянии (с помощью which.min)
 
 #6. У вас есть информация что в названии растения две первые буквы означает виды: Qn - Quince Shrubs, Qc - Quaking Aspen Trees,
 #Mn - Moonbeam Coreopsis, Mc - Miss Kim Lilac. Добавьте новую колонку с названием вида в data_plant, используя функцию match  
@@ -672,18 +752,22 @@ data_plant<-CO2 #данные - концентрация CO2 (conc) и сколько потребило растение
 trees<-Loblolly #высота деревьев разного возраста
 #1. Номер семечка (seed) у которого был минимальный рост в возрасте 25
 
-#2. минимальный возраст ПОСЛЕ которого рост растения превысил 27
+#2. минимальный возраст ПОСЛЕ которого рост растения превысил 27 
+#(то есть в этом возрасте еще не превысил, а в следующем уже превысил)
 
-##дополнительная информация о букве, кодирующей семечко семечка
+##дополнительная информация: буквы, кодирующие семечки 
+#(предположим это первая буква названия штата из которого семечка)
 trees_2<-data.frame (Seed=unique(trees$Seed)[4:10], weight= c(LETTERS [4:9],20))
 
-#3. Порядковый номер в алфавите семечки, которое набрало наибольший вес в возрасте 5 (те семечки у которых нет букв не учитывать)
+#3. Порядковый номер в алфавите буквенного кода семечки, которое набрало наибольший вес в возрасте 5 
+#(те семечки у которых нет буквенного кода не учитывать)
 
 
 beaver<-beaver1 #динамика температуры бобра
 
-#4. конечное время (time) максимального изменения температуры бобра
+#4. время (time) максимального изменения температуры бобра 
+#(время, когда это максимальное изменение закончилось)
 
-#5. время когда у бобра достигнута четвертая по величине температура тела
+#5. время (time) когда у бобра достигнута четвертая по величине температура тела
 
 
