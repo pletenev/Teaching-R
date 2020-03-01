@@ -230,7 +230,7 @@ A ==60 | A==15 | A==21 # можно написать и так, но это сложнее - больше букв
 #5. создать логический вектор Rr_y, элемент которого равен TRUE, 
 #если элемент последовательности чисел от 1 до 50 больше 15 и меньше 25
 
-#######################день3#############################################
+#######################День3#############################################
 
 ####НАЧАТЬ ЗАПИСЬ ВИДЕО ########(Студенты, если что, подскажите преподавател)
 
@@ -352,20 +352,20 @@ A[!A %in% C]
 
 #с помощью второго способа также можно перезаписывать элементы
 A[A %in% C] <- 0 #обнуляем элементы совпадающие с С
-A[A == 0] <- A[1:3] #а теперь присваиваем нулевым значениям значения первых трех элементов
+A[A == 0] <- A[1] #а теперь присваиваем нулевым значениям значения первого элемента
 
 #################мини задание###########################
 #1.создать вектор AB.1 числовой последовательности от 30 (первое значение) до 500 в котором будут только четные числа
-
 #2. переделать этот вектор чтобы значения шли по убыванию
-
 #3. вывести на экран каждое третье значение этого вектора
-
 #4. создать вектор AB.2 равный всем значениям первого вектора меньше 100 и больше 50
-
 #5. у второго вектора вывести на экран 1-ый, 3-ий и 6-ой элементы 
-
 #6. Присвоить всем элементам  вектора AB.2 которые делятся на 3 значаение NA
+
+
+
+
+
 
 
 ###################Домашнее задание 1###############################
@@ -441,182 +441,176 @@ names(currency.fx)
 #max(currency.fx)
 
 
-
+########################День4###################################################
 
 
 ##########subseting data.frame
-###1 способ - работает только с колонками (переменными) 
-currency.fx$uah #вытаскивает переменную
+ir<-iris #презагруженный data.frame
+View(ir)
+str(ir) #обратите внимание на знак доллара
 
-#создание новой колонки
-nrow(currency.fx)
-currency.fx$date<-c("m","t","w","th","fr","sa") #длинна вектора больше чем у data.frame
-currency.fx$date<-c("m","t","w","th","fr") # а здесь все ок - длина совпадает
-#4*currency.fx #уже нельзя так как один столбец это character
-currency.fx$eu<-currency.fx$eur/currency.fx$usd
+###1 способ - работает только с колонками (переменными) ####
+ir$Sepal.Length #на выходе колонка в виде ВЕКТОРА
+ir$"Sepal.Length" #это один из немногих случаев когда можно и в ковычках и без ковычек
+#с ним можно делать всё что можно с вектором
+class(ir$Species)
+levels(ir$Species)
+ir$Sepal.Length>5
 
-currency.fx$eur[1:3] #так как это обычный вектор, то его можно тоже subset - см. разделы про вектора 
-currency.fx$eur[currency.fx$eur<75.5]
-currency.fx$eur[eur<75.5] #ошибка, так как объекта eur нет, а есть объект  currency.fx$eur
-currency.fx$eur[currency.fx$usd>66] #выводятся те курсы евро, когда доллар был выше 66 рублей 
-#currency.fx$eur[currency.fx$usd>66&currency.fx$uah<23.8]
-currency.fx$eur[currency.fx$date=="m"]<-77.4 #мы переписали данные у этого вектора для понедельника
+#можно делать и subseting
+ir$Sepal.Length[1:10]
+ir$Sepal.Length[ir$Sepal.Length<5] <- NA
+ir$Sepal.Length[Sepal.Length>5] #распространенная ошибка, забывают во второй раз писать ir$
+Sepal.Length <- ir$Sepal.Length #а вот так мы можем создать новый вектор из колонки
 
-#####минизадание: создать вектор usd_w равный вектору usd из currency.fx при условии date не равен "t" 
+ir$Sepal.Length[ir$Species=="setosa"] #все Sepal.Length (чашелистик) для вида setosa. не забываем ковычки
+ir$Sepal.Length[ir$Sepal.Length>5&ir$Sepal.Width<3&ir$Species=="versicolor"]
+
+ir$Species[ir$Species=="versicolor"] <- "vers" #нельзя, так как факторная переменная, заменяет на NA
+ir$Species[is.na(ir$Species)] <- "versicolor" #is.na() - возвращает TRUE тем элементам вектора которые NA
+levels(ir$Species)[4]<-"vers" #добавляем новую категорию
+ir$Species[ir$Species=="versicolor"] <-"vers" #теперь можем заменить
 
 
-###2 способ -универсальный
-## 2а - порядковые номера или TRUE/FALSE - как subsetting у векторов, НО - два измерения (строки/столбцы)
-currency.fx[2,5] #вторая строка, 5-я колонка
-currency.fx[2:4,4:5]
-currency.fx[c(1,5), c(2,4)]
-currency.fx[nrow(currency.fx),ncol(currency.fx)-1] #предпоследний элемент data.frame
+#самый удобный способ для создание новой колонки - это как раз через $
+ir$Petal.Area<-ir$Petal.Length*ir$Petal.Width
+ir$age<-"not known"
 
-#пустое место на месте i или j означает выбор всех рядов или колонок 
-currency.fx[2,] #второй ряд и все колонки  (весь второй ряд)
-currency.fx[,c(1,5)] #первая и 5-я колонки
-currency.fx[,3] #аналогично currency.fx$uah
+#####минизадание: создать вектор Petal_l (не в data.frame, а свободный)  
+#равный вектору Petal.Length из  data.frame ir но только БЕЗ вида "virginica" 
 
-currency.fx[,-c(1,5)] #знак минус означает исключая эти порядковые номерa (в данном случае колонок)
-currency.fx[-1,] #без первого ряда
 
-#условия
-currency.fx[currency.fx$usd>66,] #условие почти всегда используется для рядов
-currency.fx[usd>66,] #объекта usd нет а есть currency.fx$usd
+#############2 способ -универсальный: два измерения [строки,столбцы]#######
+## 2а - порядковые номера
+ir[2,5] #вторая строка, 5-я колонка
+ir[2:4,4:5] #2-4 ряд, 4-5 колонка
+ir[c(1,5), c(2,4)]
+ir[nrow(ir),ncol(ir)-1] #предпоследний элемент data.frame
 
-#currency.fx[currency.fx$usd>66|currency.fx$date=="m", names(currency.fx)!="usd"] #полезное условие для колонок придумать сложнее, но можно
-currency.fx[currency.fx$date=="t",1:3]<-round(currency.fx[currency.fx$date=="t",1:3],1) #мы переписали данные, округлив их до первого знака
+#пустое место на месте строк/колонок означает выбор всех рядов или колонок 
+ir[2,] #второй ряд и все колонки  (весь второй ряд)
+ir[,c(1,5)] #первая и 5-я колонки
+ir[,3] #аналогично ir$Petal.Length
 
-currency.fx[currency.fx$usd==max(currency.fx$usd),4] #дата, когда курс доллара был максимален
-#currency.fx[currency.fx$usd==max(currency.fx$usd),]
+#отрицательные числа означают исключение этих порядковых чисел 
+ir[,-c(1,5)] #знак минус означает исключая эти порядковые номерa (в данном случае колонок). БЕЗ 1-ой и 5-ой колонки
+ir[-1,] #без первого ряда
+ir$Sepal.Length[-c(1,10)] #с векторами тоже самое, просто забыл рассказать в прошлом занятии
+
+ir_1<-ir[1:10,] #создаю новый data.frame из 10 первых рядов старого
+str(ir_1)
+ir[,ncol(ir)] <- 0 #обнуляю последнюю колонку
+ir<-ir[,-ncol(ir)] #удаляю последнюю колонку, перезаписав data.frame
+
+
+##### 2_б Логический вектор
+
+#в качестве условия ЧАЩЕ всего логические операции с колонками ТОГО ЖЕ САМОГО data.frame
+#условие почти ВСЕГДА используется для рядов
+ir[ir$Petal.Length >4.5,] #выбирает ряды где выполняется условие и все колонки
+ir[Petal.Length >4.5,] #пропущено ir$
+
+ir[, names(ir)!="Sepal.Width"] #Значительно РЕЖЕ условие пишется для колонок
+
+#можно миксовать способ 2а и 2б
+ir[ir$Petal.Width < 1,1:3] #1-3 колонка, для тех рядов где выполняется условие
+
+ir[ir$Petal.Width < 1,6]<-round(ir[ir$Petal.Width < 1,6],1) #мы переписали данные, округлив их до первого знака
+
+ir[ir$Petal.Width==max(ir$Petal.Width),5] #вид, для которого лепесток имеет наибольшую ширину, 3 случая одинаковой ширины
+ir[ir$Petal.Width==max(ir$Petal.Width),5][1] #выбираем первый
 
 #subseting можно делать несколько раз подряд
-currency.NA<-currency.fx[currency.fx$usd>65.95,] [1:2,] 
-#currency.NA
-#NA -missing values он выдал, так как после первого условия у нас оставалось 2 строчки, а я во втором subsetting выбрал четыре строчки
-#is.na(currency.NA) #проверка на NA
-#currency.NA[!is.na(currency.NA$eur)&!is.na(currency.NA$usd),] #исключение строчек в которой есть NA
-
-#currency.NA<-NULL #таким образом мы обнулили (опустошили) объект, NULL часто появляется, когда на выходe функции получается пустой объект  
-#class(currency.NA)
-#is.null(currency.NA)
+ir[ir$Petal.Width>mean(ir$Petal.Width),] [1:2,] 
 
 ###не забываем subsetting с [] можно ставить слева и таким образом переписывать
-currency.fx[currency.fx$usd==65.9300,5]<-NA
+ir[ir$Petal.Width==min(ir$Petal.Width),1:3]<-0
 
-######минизадание создать data.frame currency.hr в котором будут все данные currency.fx кроме тех, 
-#где uah равен 23.9000 или 23.6641
-currency.hr<-currency.fx[!currency.fx$uah %in% c(23.9000,23.6641),]
-currency.hr<-currency.fx[!(currency.fx$uah==23.9|currency.fx$uah==23.6641)]
-####2b название колонок/рядов
-currency.fx[,"uah"] #аналогично currency.fx$uah
-currency.fx[,usd] #не забывайте КАВЫЧКИ - а то R думает что это название объекта
-a<-"usd"
-currency.fx[,a] #а вот так можно
-currency.fx[,c("date","uah")]
-
-#currency.fx[c("a","c"),c("date","uah")] 
-currency.fx[,-c("date","uah")] #минус не работает с названиями колонок, только с их порядковыми номерами
-currency.fx[,!names(currency.fx) %in% c("date","uah")] #можно так
-
-currency.uah <- currency.fx[,c("date","uah")] #не забываем что во всех приведенных выше случаях, 
-#все что выведено на экран можно вместо этого записать как новый объект
-#currency.uah 
-
-######минизадание: вывести на экран данные currency.fx для колонок "usd","uah" 
-#для случая когда eu больше 1.135
-currency.fx[currency.fx$eu>1.135,c("usd","uah")]
+######минизадание создать data.frame ir.hr в котором будут все данные ir кроме колонки "Petal.Area" и кроме тех рядов 
+#где Petal.Width равен 0.2,  1.3 или 1.6
 
 
-#####третий вариант - специальные функции для subseting
-head(currency.fx, n=3) #первые 3 ряда - аналогично currency.fx[1:3,]
-tail(currency.fx, n=2) # последние 2 ряда - аналогично currency.fx[(nrow(currency.fx)-1):nrow(currency.fx),]
-head(hryvna, n=3) #для векторов тоже работает
+####2c ВЕКТОР названий колонок/рядов, в КОВЫЧКАХ!!
+###
+ir[,"Sepal.Width"] #аналогично ir$Sepal.Width
+ir[,Sepal.Width] #не забывайте КАВЫЧКИ - а то R думает что это название объекта
+a<-"Sepal.Width"
+ir[,a] #а вот так можно
+ir[,c("Sepal.Width","Species")]
 
-#subsetting по рядам
-subset(currency.fx, (usd<66.5&eur>75.2)| date=="t") #здесь название колонок БЕЗ КАВЫЧЕК (исключение из правила)
+
+ir[,-c("Sepal.Width","Species")] #минус не работает с названиями колонок, только с их порядковыми номерами
+ir[,!names(ir) %in% c("Sepal.Width","Species")] #можно так, но это способ 2б
+
+#c рядами ситуация аналогична, только названия ставятся в другое место 
+row.names(ir)
+row.names(ir)<-paste(row.names(ir), letters, sep="") #paste() сшивает character вектора
+ir[c("2b","9i"),]
+
+#способ 2с можно миксовать с 2a и 2b
+ir[ir$Petal.Length <= 3,c("Sepal.Width","Species")]
+ir[1:4,c("Sepal.Width","Species")]
+
+######минизадание: вывести на экран данные ir для колонок "Petal.Length","Petal.Area" 
+#для видов vers 
+ir[ir$eu>1.135,c("usd","uah")]
+
+
+#####3 вариант - специальные функции для subseting
+head(ir, n=3) #первые 3 ряда - аналогично ir[1:3,]
+tail(ir, n=2) # последние 2 ряда - аналогично ir[(nrow(ir)-1):nrow(ir),]
+head(ir$Sepal.Length, n=3) #для векторов тоже работает
+
+#subsetting по рядам с логическим сравнением
+subset(ir, (Petal.Area<6&Species=="setosa")| Species=="vers") #здесь название колонок БЕЗ КАВЫЧЕК (исключение из правила)
+
 #subset полезен если у тебя множественное сравнение, экономит место, так как не надо каждый раз писать название
 # data.frame - сравните аналог 
-currency.fx[(currency.fx$usd<66.5&currency.fx$eur>75.2)| currency.fx$date=="t",]
+ir[(ir$Petal.Area<6&ir$Species=="setosa")| ir$Species=="vers",]
+
+subset(ir,Petal.Area<6, select=c(1,5)) #параметр select выбирает колонки
+ir5 <- subset(ir,Petal.Area<6, select=c("Species","Sepal.Width","Sepal.Length")) #можно и так, порядок колонок поменялся
+
 
 ####нельзя subset, head, tail слева от знака присваивания (поэтому слева только [])
-subset(currency.fx, usd<66.5) <- 0 #ошибка
+#то есть нельзя перезаписывать
+subset(ir, Petal.Area<6) <- 0 #ошибка
 
 #последовательный subsetting
-subset(currency.fx, usd>65.8)$usd [1:3] # курс доллара для случаев когда курс был больше 66
+subset(ir, Petal.Area<6)$Species [1:3] # курс доллара для случаев когда курс был больше 66
 
-subset(currency.fx, (eur-usd)==max(eur-usd))$date #дата когда разница между курсами была максимальной
+#вид у которого разница длинной и шириной лепестка была максимальной
+subset(ir, (Petal.Length-Petal.Width)==max(Petal.Length-Petal.Width))$Species 
 
 # а его аналог без subset 
-currency.fx$date[(currency.fx$eur-currency.fx$usd)==max(currency.fx$eur-currency.fx$usd)]
-
-###минизадание: с помощью subset выведете на экран данные (ряд) 
-#из currency.fx когда курс евро был максимальным
-subset(currency.fx, eur==max(eur))
+ir$Species[(ir$Petal.Length-ir$Petal.Width)==max(ir$Petal.Length-ir$Petal.Width)] #очень много ir$
 
 
-#######ещё полезные функции чтобы не писать все время название data.frame (не )
-####with()
-currency.fx$new<-with (currency.fx, (eur/uah)*usd+eu) 
-with(currency.fx, usd[usd==max(usd)])
-
-####with тоже нельзя слева
-with(currency.fx, usd[usd==max(usd)])<-0
+###минизадание: с помощью subset выведете на экран данные (ряд или если несколько то ряды) 
+#из ir когда Petal.Length был минимальным
 
 
-#удобно в сочетании с subset
-with(subset(currency.fx, usd>66), mean(eur/usd+34*uah)) #расчет для ситуации когда курс доллара больше 66
-#а можно так
-with(currency.fx[currency.fx$usd>66,], mean(eur/usd+34*uah)) 
+########## Задачи с subseting 
+######статистическая операция с результатом subsetting
+#разность средних значений ширины лепестка у двух видов
+mean(ir$Petal.Width[ir$Species=="vers"]) - mean(ir$Petal.Width[ir$Species=="setosa"])
 
+#максимально значение ширины лепестка у одного из видов для случаев когда длина лепестка меньше среднего
+max(subset(ir,Species=="setosa" & Petal.Length < mean(Petal.Length))$Petal.Width)
 
-#фигурные скобки позволяют выполнить несколько действий в рамках with (используется и рядом других функций)
-#with(subset(currency.fx, usd>66), {
-  #print(mean(eur/usd))  #print - вывод на экран
-  #print(sd(eur/usd))
-  #print(max(eur/usd))
-  #})
-
-####attach - отменяет необходимость писать название data.frame навсегда, пока не напишешь detach
-####количество detach должно быть равно количеству attach
-attach(currency.fx)
-usd/eur
-usd[usd==max(usd)]
-detach(currency.fx)
-
-usd/eur
-
-#эта функция опасна, так как
-# 1.названия некоторых объектов могут совпадать с названиями колонок data.frame
-#2.когда atach и detach далеко разнесены можно запутаться
-date<-5
-attach(currency.fx)
-usd[date=="m"] #так как есть объект date,то он его успользует а не currency.fx$date
-detach(currency.fx)
-
-
-########Cливание двух датафреймов
-###по строкам (количество колонок должно быть равно)
-currency.new<-data.frame(eur=c(76.5481, 77.5541),usd=c(66.6499, 66.4318), date=c("m","t"),
-               uah=c(23,24), eu=c(76.5481, 77.5541)/c(66.6499, 66.4318), new=NA)
-currency.fx<-rbind(currency.fx, currency.new) #raw bind - слияние по рядам
-currency.fx[nrow(currency.fx)+1,]<-currency.fx[1,]
-currency.fx$ffg<-1
-###по колонкам (количество строк долно быть равно)
-holidays_time<-data.frame(holidays=c(rep("w",5), "h","h"), time=c(10:16))
-currency<-cbind(currency.fx,holidays_time) #column bind
-
-
-########## Задача - узнать делители числа
+######узнать делители числа
 a<-11870
 del<-data.frame(del=1:a, result=a/(1:a))
 del[(del$result-round(del$result))==0,]$del #функция round округляет до указанного порядка (по умолчанию до целого)
 del[(del$result-round(del$result))==0,1]
 
-#################Задание в классе 2###########################
+
+
+#################Дошашнее задание 2###########################
 data_chick<-ChickWeight #ChickWeight - это одна из предустановленных (built-in) data.frame: вес,возраст,номер цыпленка, номер диеты
 str(data_chick)
 data_chick$Chick
+
 #1. выберите  данные по цыплятам 13-18 и запишите в датафрейм chick_13_18. 
 #Далее в заданиях используйте этот дата фрейм chick_13_18
 
@@ -635,7 +629,7 @@ data_chick$Chick
 #7. добавьте в датафрейм новую строчку в которой будет средний вес цыпленка 13 за все время, в качестве значения возраста напишите "average"
 #обратите внимание что вы таким образом изменили класс вектора Time
  
-#################Домашнее задание 2###########################
+#################Домашнее задание 3###########################
 data_chick<-ChickWeight #работаем снова с ней
 summary(data_chick)
 
@@ -655,10 +649,12 @@ summary(data_chick)
 #7. максимальный (с точки зрения порядка факторов) номер (Chick) цыпленка у которого вес в каком-либо из 
 #возрастов был больше 200, но при этом вес при рождении (Time 0) был меньше 40
 
-################день 3######################################
+
+
 rm(list=ls()) #удаление всех объектов из памяти
 
 ############Загрузка и выгрузка данных#####################
+getwd() #текущая папка по умолчанию
 setwd("C:/R/Teaching/Data") #set working directory - установка папки по умолчанию
 #Обратите внимание, что здесь не прямой (как в Windows), а обратный слеш, так как прямой используется как знак деления
 
@@ -668,9 +664,16 @@ setwd("C:\\R\\Teaching\\Data")
 #при загрузке или выгрузки данных, если путь к файлу не указан, то используется путь к папке по умолчанию 
 
 ###загрузка csv, функция read.csv2 используется для загрузки csv "российского формата" (где разделители между колонками точки с запятой)
-films<-read.csv2(file="film.csv", dec=".", stringsAsFactors = FALSE) #загружает как data.frame
-#параметр dec - кокой знак отделяет целые от десятичных, если у вас запятая, то надо использовать ","  
+films<-read.csv2(file="film.csv", dec=".") #загружает как data.frame
+#параметр dec - какой знак отделяет целые от десятичных, если у вас запятая, то надо использовать ","  
+
+films<-read.csv2(file="C:/R/Teaching/Data/film.csv", dec=".") #можно и весь путь прописать, если не в папке по умолчанию
+
+str(films) #все строковые воспринимает как факторные
+
+films<-read.csv2(file="film.csv", dec=".", stringsAsFactors = FALSE) #
 # stringsAsFactors - воспринимать ли строковые переменные как факторы
+
 str(films)
 
 #другой вариант, прописать все классы переменных вручную с помощью параметра colClasses
@@ -684,6 +687,14 @@ comedies<-films[films$Subject=="Comedy"&films$Awards=="Yes", ]
 
 #теперь выгружаем (сохраняем) новую data.frame на диск
 write.csv2(comedies, file="Comedies with awards.csv")
+
+##############Задание в классе
+#сохранить свои данные из Excel в csv(разделитель запятые), загрузить свои данные в R, 
+#сделать какой-то subseting - сохранить его в csv и как объект R,
+#удалить все данные из R и загрузить снова в R этот subsetting
+
+
+
 
 ########сохранение объекта для дальнейшего использования в R
 #мы хотим сохранить объект films, чтобы заново не загружать его из csv
@@ -709,10 +720,59 @@ rm(list=ls()) #удаление всех объектов из памяти
 
 load(file="fantasy_and_popular") #сразу загружает в global environment, знак присвоения не нужен
 
-##############Задание в классе
-#сохранить данные из Excel в csv(разделитель запятые), загрузить свои данные в R, 
-#сделать какой-то subseting - сохранить его в csv и как объект R,
-#удалить все данные из R и загрузить снова в R этот subsetting
+
+
+
+#######ещё полезные функции чтобы не писать все время название data.frame (не )
+####with()
+ir$new<-with (ir, (eur/uah)*usd+eu) 
+with(ir, usd[usd==max(usd)])
+
+####with тоже нельзя слева
+with(ir, usd[usd==max(usd)])<-0
+
+
+#удобно в сочетании с subset
+with(subset(ir, usd>66), mean(eur/usd+34*uah)) #расчет для ситуации когда курс доллара больше 66
+#а можно так
+with(ir[ir$usd>66,], mean(eur/usd+34*uah)) 
+
+
+#фигурные скобки позволяют выполнить несколько действий в рамках with (используется и рядом других функций)
+#with(subset(ir, usd>66), {
+#print(mean(eur/usd))  #print - вывод на экран
+#print(sd(eur/usd))
+#print(max(eur/usd))
+#})
+
+####attach - отменяет необходимость писать название data.frame навсегда, пока не напишешь detach
+####количество detach должно быть равно количеству attach
+attach(ir)
+usd/eur
+usd[usd==max(usd)]
+detach(ir)
+
+usd/eur
+
+#эта функция опасна, так как
+# 1.названия некоторых объектов могут совпадать с названиями колонок data.frame
+#2.когда atach и detach далеко разнесены можно запутаться
+date<-5
+attach(ir)
+usd[date=="m"] #так как есть объект date,то он его успользует а не ir$date
+detach(ir)
+
+
+########Cливание двух датафреймов
+###по строкам (количество колонок должно быть равно)
+currency.new<-data.frame(eur=c(76.5481, 77.5541),usd=c(66.6499, 66.4318), date=c("m","t"),
+                         uah=c(23,24), eu=c(76.5481, 77.5541)/c(66.6499, 66.4318), new=NA)
+ir<-rbind(ir, currency.new) #raw bind - слияние по рядам
+ir[nrow(ir)+1,]<-ir[1,]
+ir$ffg<-1
+###по колонкам (количество строк долно быть равно)
+holidays_time<-data.frame(holidays=c(rep("w",5), "h","h"), time=c(10:16))
+currency<-cbind(ir,holidays_time) #column bind
 
 
 #########классы матрицы, таблицы, list#############
