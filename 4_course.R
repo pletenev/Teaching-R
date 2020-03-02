@@ -442,7 +442,7 @@ names(currency.fx)
 
 
 ########################День4###################################################
-
+####НАЧАТЬ ЗАПИСЬ########
 
 ##########subseting data.frame
 ir<-iris #презагруженный data.frame
@@ -475,20 +475,21 @@ ir$Species[ir$Species=="versicolor"] <-"vers" #теперь можем заменить
 #самый удобный способ для создание новой колонки - это как раз через $
 ir$Petal.Area<-ir$Petal.Length*ir$Petal.Width
 ir$age<-"not known"
-
+#ir$rt<-c(9,4,5, rep(NA, nrow(ir)-3))
 #####минизадание: создать вектор Petal_l (не в data.frame, а свободный)  
 #равный вектору Petal.Length из  data.frame ir но только БЕЗ вида "virginica" 
 
 
 #############2 способ -универсальный: два измерения [строки,столбцы]#######
 ## 2а - порядковые номера
+#название колонок не являются первой строкой data.frame
 ir[2,5] #вторая строка, 5-я колонка
-ir[2:4,4:5] #2-4 ряд, 4-5 колонка
-ir[c(1,5), c(2,4)]
+ir[1:4,4:5] #1-4 строку, 4-5 колонка
+ir[c(1,5), c(2,4)] #
 ir[nrow(ir),ncol(ir)-1] #предпоследний элемент data.frame
 
 #пустое место на месте строк/колонок означает выбор всех рядов или колонок 
-ir[2,] #второй ряд и все колонки  (весь второй ряд)
+ir[1,] #второй ряд и все колонки  (весь второй ряд)
 ir[,c(1,5)] #первая и 5-я колонки
 ir[,3] #аналогично ir$Petal.Length
 
@@ -502,12 +503,14 @@ str(ir_1)
 ir[,ncol(ir)] <- 0 #обнуляю последнюю колонку
 ir<-ir[,-ncol(ir)] #удаляю последнюю колонку, перезаписав data.frame
 
+#####минизадание######
+#Вывести на экран 5 - 10 и 15 ряды из ir без 3 ей колонки
 
-##### 2_б Логический вектор
-
+#####2_б Логический вектор########
 #в качестве условия ЧАЩЕ всего логические операции с колонками ТОГО ЖЕ САМОГО data.frame
 #условие почти ВСЕГДА используется для рядов
-ir[ir$Petal.Length >4.5,] #выбирает ряды где выполняется условие и все колонки
+
+ir[ir$Petal.Length > 4.5,] #выбирает ряды где выполняется условие и все колонки
 ir[Petal.Length >4.5,] #пропущено ir$
 
 ir[, names(ir)!="Sepal.Width"] #Значительно РЕЖЕ условие пишется для колонок
@@ -551,12 +554,12 @@ ir[c("2b","9i"),]
 ir[ir$Petal.Length <= 3,c("Sepal.Width","Species")]
 ir[1:4,c("Sepal.Width","Species")]
 
-######минизадание: вывести на экран данные ir для колонок "Petal.Length","Petal.Area" 
+######минизадание####
+# вывести на экран данные ir для колонок "Petal.Length","Petal.Area" 
 #для видов vers 
-ir[ir$eu>1.135,c("usd","uah")]
 
 
-#####3 вариант - специальные функции для subseting
+#####3 вариант - специальные функции для subseting########
 head(ir, n=3) #первые 3 ряда - аналогично ir[1:3,]
 tail(ir, n=2) # последние 2 ряда - аналогично ir[(nrow(ir)-1):nrow(ir),]
 head(ir$Sepal.Length, n=3) #для векторов тоже работает
@@ -570,7 +573,7 @@ ir[(ir$Petal.Area<6&ir$Species=="setosa")| ir$Species=="vers",]
 
 subset(ir,Petal.Area<6, select=c(1,5)) #параметр select выбирает колонки
 ir5 <- subset(ir,Petal.Area<6, select=c("Species","Sepal.Width","Sepal.Length")) #можно и так, порядок колонок поменялся
-
+ir[ir$Petal.Area<6,c("Species","Sepal.Width","Sepal.Length")]
 
 ####нельзя subset, head, tail слева от знака присваивания (поэтому слева только [])
 #то есть нельзя перезаписывать
@@ -588,22 +591,6 @@ ir$Species[(ir$Petal.Length-ir$Petal.Width)==max(ir$Petal.Length-ir$Petal.Width)
 
 ###минизадание: с помощью subset выведете на экран данные (ряд или если несколько то ряды) 
 #из ir когда Petal.Length был минимальным
-
-
-########## Задачи с subseting 
-######статистическая операция с результатом subsetting
-#разность средних значений ширины лепестка у двух видов
-mean(ir$Petal.Width[ir$Species=="vers"]) - mean(ir$Petal.Width[ir$Species=="setosa"])
-
-#максимально значение ширины лепестка у одного из видов для случаев когда длина лепестка меньше среднего
-max(subset(ir,Species=="setosa" & Petal.Length < mean(Petal.Length))$Petal.Width)
-
-######узнать делители числа
-a<-11870
-del<-data.frame(del=1:a, result=a/(1:a))
-del[(del$result-round(del$result))==0,]$del #функция round округляет до указанного порядка (по умолчанию до целого)
-del[(del$result-round(del$result))==0,1]
-
 
 
 #################Дошашнее задание 2###########################
@@ -649,9 +636,22 @@ summary(data_chick)
 #7. максимальный (с точки зрения порядка факторов) номер (Chick) цыпленка у которого вес в каком-либо из 
 #возрастов был больше 200, но при этом вес при рождении (Time 0) был меньше 40
 
+#################День5#####################
+####Запись!
+########## Задачи с subseting (не будем рассматривать)
+######статистическая операция с результатом subsetting
+#разность средних значений ширины лепестка у двух видов
+mean(ir$Petal.Width[ir$Species=="vers"]) - mean(ir$Petal.Width[ir$Species=="setosa"])
 
+#максимально значение ширины лепестка у одного из видов для случаев когда длина лепестка меньше среднего
+max(subset(ir,Species=="setosa" & Petal.Length < mean(Petal.Length))$Petal.Width)
 
-rm(list=ls()) #удаление всех объектов из памяти
+######узнать делители числа
+a<-11870
+del<-data.frame(del=1:a, result=a/(1:a))
+del[(del$result-round(del$result))==0,]$del #функция round округляет до указанного порядка (по умолчанию до целого)
+del[(del$result-round(del$result))==0,1]
+
 
 ############Загрузка и выгрузка данных#####################
 getwd() #текущая папка по умолчанию
@@ -688,13 +688,201 @@ comedies<-films[films$Subject=="Comedy"&films$Awards=="Yes", ]
 #теперь выгружаем (сохраняем) новую data.frame на диск
 write.csv2(comedies, file="Comedies with awards.csv")
 
-##############Задание в классе
+##############Задание в классе######################
 #сохранить свои данные из Excel в csv(разделитель запятые), загрузить свои данные в R, 
 #сделать какой-то subseting - сохранить его в csv и как объект R,
 #удалить все данные из R и загрузить снова в R этот subsetting
 
 
+######Класс объекта list##########
+######класс list - список разномастных объектов
+###сделаем list с исследованием
+data_chick<-ChickWeight #презагруженный data.frame
+chick_survey<-list(data=data_chick, authors=c("Anton", "Gosha", "Petya"), 
+                   temperature=data.frame(year=c(2016:2018),temp=c(23,25,27)),
+                   period="2016-2018", journal="Ecology", Citations=134) 
+#первый и третий элемент - data.frame, остальные вектора
+str(chick_survey)#показывает разноуровневую картину и как добраться до нужного элемент разного уровня
 
+###subseting
+#1 c помощью $ и названия элемента
+chick_survey$authors
+chick_survey$data$Time #сначала subsetting list а потом data.frame
+
+##2 c помощью двойных квадратных скобок [[]] и ОДНОГО названия либо ОДНОГО порядкового элемента
+#по названию
+chick_survey[["authors"]]
+chick_survey[[authors]] #забыли кавычки
+
+#по порядковому номеру
+chick_survey[[1]] # аналог, в двойный скобках только одно измерение - никаких запятых в [[]]
+
+chick_survey[[c("authors","data")]] #когда несколько названий то не работает
+chick_survey[[c(3,1)]] # так лучше тоже не делать, а лучше последовательный subseting
+
+#3 если одинарные скобки то выдает не элементы, а list из этих элементов
+chick_survey[2] # list из одного элемента
+class(chick_survey[2])
+class(chick_survey[[2]])
+
+
+chick_survey[c(1,3)] #list из двух элементов
+chick_survey[c("data","temperature")] #то же самое
+
+#последовательный subsetting
+chick_survey[[1]] [1,3] #так как chick_survey[[1]] обычная data.frame
+a<-mean(chick_survey[[1]]$Time)
+
+##часто list сложные объекты, типа результат регрессии
+lm(data_chick$weight~data_chick$Time) #lm() - функция линейной регрессии, ~ знак зависимости
+a<-lm(data_chick$weight~data_chick$Time)
+str(a) #list из 12 элементов, один из них data.frame -model
+str(a$model) #это исходные данные модели
+a$fitted.values # 
+a$coefficients
+
+###########графики#############################
+ir<-iris
+
+##график одной переменной
+plot(y=ir$Sepal.Length, x=1:nrow(ir))
+
+##scatter plot
+plot(y=ir$Sepal.Length, x=ir$Sepal.Width)
+
+##график из data.frame
+plot(ir)
+
+#вид графика
+?plot
+plot(y=ir$Sepal.Length, x=ir$Sepal.Width, type="l")
+plot(y=ir$Sepal.Length, x=ir$Sepal.Width, type="o")
+plot(y=ir$Sepal.Length, x=ir$Sepal.Width, type="b")
+#название графика и осей
+#параметр main - название графика; sub - дополнительное название; xlab,ylab название осей
+plot(y=ir$Sepal.Length, x=ir$Sepal.Width, type="o",
+     main="Характеристики чашелистика", sub="Sepal.Length vs Sepal.Width",
+     xlab="Ширина, см", ylab="Длинна, см")
+
+#цвет
+#параметр col
+?par
+plot(y=ir$Sepal.Length, x=ir$Sepal.Width, type="o", col="blue",
+     main="Характеристики чашелистика",
+     xlab="Ширина, см", ylab="Длинна, см")
+plot(y=ir$Sepal.Length, x=ir$Sepal.Width, type="o", col=4,
+     main="Характеристики чашелистика",
+     xlab="Ширина, см", ylab="Длинна, см")
+
+#http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf очень много цветов
+plot(y=ir$Sepal.Length, x=ir$Sepal.Width, type="o", col="darkgoldenrod", # в ковычках
+     main="Характеристики чашелистика",
+     xlab="Ширина, см", ylab="Длинна, см")
+
+#####вид точек и линий
+#https://www.statmethods.net/advgraphs/parameters.html   хороший guide
+
+#pch - вид точек, lty - вид линий, lwd - толщина линии
+plot(y=ir$Sepal.Length, x=ir$Sepal.Width, type="o", pch=16, lty=2, lwd=2,
+     col="darkgoldenrod", # в ковычках
+     main="Характеристики чашелистика",
+     xlab="Ширина, см", ylab="Длинна, см")
+
+####величина символов
+#cex - увеличивает все символы (точки) на графике (по умолчанию cex=1)
+plot(y=ir$Sepal.Length, x=ir$Sepal.Width, cex=2,
+     type="o", pch=16, lty=2, lwd=2,
+     col="darkgoldenrod", # в ковычках
+     main="Характеристики чашелистика",
+     xlab="Ширина, см", ylab="Длинна, см")
+
+#cex.lab - величину шрифта названия осей, cex.axis - величину шрифта чисел на осях
+plot(y=ir$Sepal.Length, x=ir$Sepal.Width, cex=1.5, cex.lab=1.5,cex.axis=1.5,
+     type="o", pch=16, lty=2, lwd=2,
+     col="darkgoldenrod", # в ковычках
+     main="Характеристики чашелистика",
+     xlab="Ширина, см", ylab="Длинна, см")
+
+#добавить еще линию
+#функция points
+points(y=ir$Petal.Length, x=ir$Petal.Width, cex=1.5, cex.lab=1.5,cex.axis=1.5,
+     type="o", pch=17, lwd=2,
+     col="darkblue") #не хватает длинны осей
+
+#перестраиваем первый график добавляя параметры xlim и ylim в которых вектор из 2 чисел (начальное, конечное значение)
+plot(y=ir$Sepal.Length, x=ir$Sepal.Width, xlim=c(0, max(ir$Sepal.Width,ir$Petal.Width)),
+     ylim=c(0, max(ir$Sepal.Length,ir$Petal.Length)),
+     cex=1.5, cex.lab=1.5,cex.axis=1.5,
+     type="o", pch=16, lty=2, lwd=2,
+     col="darkgoldenrod", # в ковычках
+     main="Характеристики чашелистика",
+     xlab="Ширина, см", ylab="Длинна, см")
+
+points(y=ir$Petal.Length, x=ir$Petal.Width, cex=1.5, cex.lab=1.5,cex.axis=1.5,
+       type="o", pch=17, lwd=2,
+       col="darkblue")#теперь все ОК
+
+########в качества pch, col и многих других параметров может выступать вектор равный y и x
+plot(y=ir$Sepal.Length, x=ir$Sepal.Width, col=1:nrow(ir),
+     cex=1.5, type="p", pch=1:25, lty=2, lwd=2,
+     main="Характеристики чашелистика",
+     xlab="Ширина, см", ylab="Длинна, см")
+
+##теперь засунем в col и pch переменную название вида
+as.numeric(ir$Species)
+plot(y=ir$Sepal.Length, x=ir$Sepal.Width, col=as.numeric(ir$Species),
+     cex=2, type="p", pch=as.numeric(ir$Species), lty=2, lwd=2,
+     main="Характеристики чашелистика",
+     xlab="Ширина, см", ylab="Длинна, см")
+
+#создаю свои цвета для каждого вида
+color<-rep("darkblue", nrow(ir))
+color[ir$Species=="setosa"] <- "darkgoldenrod"
+color[ir$Species=="versicolor"] <- "deeppink"
+
+plot(y=ir$Sepal.Length, x=ir$Sepal.Width, col=color,
+     cex=2, type="p", pch=as.numeric(ir$Species)+15, lty=2, lwd=2, #у нас будет pch 16,17,18
+     main="Характеристики чашелистика",
+     xlab="Ширина, см", ylab="Длинна, см")
+
+#как сохранять картинку
+setwd("C:/R/Teaching/Data") #не забываем папку по умолчанию
+png(filename="plot.png")
+
+plot(y=ir$Sepal.Length, x=ir$Sepal.Width, col=color,
+       cex=2, type="p", pch=as.numeric(ir$Species)+15, lty=2, lwd=2, #у нас будет pch 16,17,18
+       main="Характеристики чашелистика",
+       xlab="Ширина, см", ylab="Длинна, см")
+ dev.off()
+
+#гистограмма
+hist(ir$Sepal.Length)
+#используются те же параметры par
+hist(ir$Sepal.Length, col="blue",
+     main="Характеристики чашелистика",
+     xlab="Длинна, см", ylab="Кол-во экземпляров")
+#важный параметр breacks
+hist(ir$Sepal.Length, breaks=50,
+     col="blue", main="Характеристики чашелистика",
+      xlab="Длинна, см", ylab="Кол-во экземпляров")
+hist(ir$Sepal.Length, breaks=c(4,5,6,7,8),
+     col="blue", main="Характеристики чашелистика",
+     xlab="Длинна, см", ylab="Кол-во экземпляров")
+#3D
+#устанавливаем пакеты - это надо сделать 1 раз и на всю жизнь! (ну если не сменишь компьютер и т.п)
+install.packages("fields")
+install.packages("graphics")
+
+#загружаем пакеты в память R, нужно делать кажды раз как запускаешь R
+require(fields)
+require(graphics)
+
+image.plot(as.image(x=ir[,1:2], Z=ir$Petal.Length, nrow=16,ncol=16),#x здесь это x и y на графике, поэтому data.frame
+         col=c('royalblue1','yellow','orange','tomato','red'),xlab='Sepal.Length',ylab='Sepal.Width')
+
+
+#######минизадание#####
+#постройте графики на основе своих данных
 
 ########сохранение объекта для дальнейшего использования в R
 #мы хотим сохранить объект films, чтобы заново не загружать его из csv
@@ -817,43 +1005,6 @@ sum1.data<-data.frame(t(matrix(sum1))) #перевод в data.frame
 names(sum1.data)<-names(sum1)
 sum1.data
 
-######класс list - список разномастных объектов
-###сделаем list с исследованием
-chick_survey<-list(data=data_chick, authors=c("Anton", "Gosha", "Petya"), 
-                   temperature=data.frame(year=c(2016:2018),temp=c(23,25,27)),
-                   period="2016-2018", journal="Ecology", Citations=134)
-str(chick_survey)
-
-###subseting
-chick_survey$authors
-chick_survey[[2]] # аналог, в двойный скобках только одно измерение - никаких запятых в [[]]
-chick_survey[2] #а если так то выдаст list одного элемента
-str(chick_survey[2])
-
-chick_survey[c(1,3)] #list из двух элементов
-chick_survey[c("data","temperature")] #то же самое
-
-#последовательный subsetting
-chick_survey[[1]] [1,3] #так как chick_survey[[1]] обычная data.frame
-a<-mean(chick_survey[[1]]$Time)
-
-###элементом list может быть list
-#создаем новый элемент у chick_survey
-chick_survey$reviews<-list(result="accepted", 
-                           marks=data.frame(reviewers=c("Vova","Petya","Dasha"), marks=c(7,8,6)))
-str(chick_survey)
-chick_survey$reviews$result
-
-##часто list сложные объекты, типа результат регрессии
-lm(data_chick$weight~data_chick$Time) #lm() - функция линейной регрессии, ~ знак зависимости
-a<-lm(data_chick$weight~data_chick$Time)
-str(a) #list из 12 элементов, один из них data.frame -model
-str(a$model) #это исходные данные модели
-a$model$"data_chick$weight" #"data_chick$weight" - это название переменной, поэтому в кавычках
-a<-lm(data=data_chick, weight~Time)
-
-####минизадание: вывести на экран 4-10 элемент 5-ого элемента объекта a
-a[[5]][4:10]
 
 
 #######полезные функции для работы с объектами#####
