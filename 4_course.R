@@ -442,7 +442,7 @@ names(currency.fx)
 
 
 ########################ƒень4###################################################
-####Ќј„ј“№ «јѕ»—№########
+####Ќј„ј“№ «јѕ»—№
 
 ##########subseting data.frame
 ir<-iris #презагруженный data.frame
@@ -647,7 +647,7 @@ mean(ir$Petal.Width[ir$Species=="vers"]) - mean(ir$Petal.Width[ir$Species=="seto
 max(subset(ir,Species=="setosa" & Petal.Length < mean(Petal.Length))$Petal.Width)
 
 ######узнать делители числа
-a<-11870
+a<-345667
 del<-data.frame(del=1:a, result=a/(1:a))
 del[(del$result-round(del$result))==0,]$del #функци€ round округл€ет до указанного пор€дка (по умолчанию до целого)
 del[(del$result-round(del$result))==0,1]
@@ -690,8 +690,8 @@ write.csv2(comedies, file="Comedies with awards.csv")
 
 ##############«адание в классе######################
 #сохранить свои данные из Excel в csv(разделитель зап€тые), загрузить свои данные в R, 
-#сделать какой-то subseting - сохранить его в csv и как объект R,
-#удалить все данные из R и загрузить снова в R этот subsetting
+#сделать какой-то subseting - сохранить его в csv,
+
 
 
 ###### ласс объекта list##########
@@ -715,7 +715,7 @@ chick_survey[["authors"]]
 chick_survey[[authors]] #забыли кавычки
 
 #по пор€дковому номеру
-chick_survey[[1]] # аналог, в двойный скобках только одно измерение - никаких зап€тых в [[]]
+chick_survey[[3]] # аналог, в двойный скобках только одно измерение - никаких зап€тых в [[]]
 
 chick_survey[[c("authors","data")]] #когда несколько названий то не работает
 chick_survey[[c(3,1)]] # так лучше тоже не делать, а лучше последовательный subseting
@@ -728,7 +728,7 @@ class(chick_survey[[2]])
 
 chick_survey[c(1,3)] #list из двух элементов
 chick_survey[c("data","temperature")] #то же самое
-
+chick_survey<-chick_survey[-length(chick_survey)]
 #последовательный subsetting
 chick_survey[[1]] [1,3] #так как chick_survey[[1]] обычна€ data.frame
 a<-mean(chick_survey[[1]]$Time)
@@ -740,7 +740,8 @@ str(a) #list из 12 элементов, один из них data.frame -model
 str(a$model) #это исходные данные модели
 a$fitted.values # 
 a$coefficients
-
+str(a$qr$qr)
+dimnames(a$qr$qr)[[1]]
 ###########графики#############################
 ir<-iris
 
@@ -752,7 +753,7 @@ plot(y=ir$Sepal.Length, x=ir$Sepal.Width)
 
 ##график из data.frame
 plot(ir)
-
+#plot(a)
 #вид графика
 ?plot
 plot(y=ir$Sepal.Length, x=ir$Sepal.Width, type="l")
@@ -770,7 +771,7 @@ plot(y=ir$Sepal.Length, x=ir$Sepal.Width, type="o",
 plot(y=ir$Sepal.Length, x=ir$Sepal.Width, type="o", col="blue",
      main="’арактеристики чашелистика",
      xlab="Ўирина, см", ylab="ƒлинна, см")
-plot(y=ir$Sepal.Length, x=ir$Sepal.Width, type="o", col=4,
+plot(y=ir$Sepal.Length, x=ir$Sepal.Width, type="o", col=14,
      main="’арактеристики чашелистика",
      xlab="Ўирина, см", ylab="ƒлинна, см")
 
@@ -805,7 +806,7 @@ plot(y=ir$Sepal.Length, x=ir$Sepal.Width, cex=1.5, cex.lab=1.5,cex.axis=1.5,
 
 #добавить еще линию
 #функци€ points
-points(y=ir$Petal.Length, x=ir$Petal.Width, cex=1.5, cex.lab=1.5,cex.axis=1.5,
+points(y=ir$Petal.Length, x=ir$Petal.Width, cex=1.5,
      type="o", pch=17, lwd=2,
      col="darkblue") #не хватает длинны осей
 
@@ -827,7 +828,8 @@ plot(y=ir$Sepal.Length, x=ir$Sepal.Width, col=1:nrow(ir),
      cex=1.5, type="p", pch=1:25, lty=2, lwd=2,
      main="’арактеристики чашелистика",
      xlab="Ўирина, см", ylab="ƒлинна, см")
-
+boxplot(ir$Sepal.Length ~ ir$Species)
+plot(ir$Sepal.Length ~ ir$Species)
 ##теперь засунем в col и pch переменную название вида
 as.numeric(ir$Species)
 plot(y=ir$Sepal.Length, x=ir$Sepal.Width, col=as.numeric(ir$Species),
@@ -853,7 +855,7 @@ plot(y=ir$Sepal.Length, x=ir$Sepal.Width, col=color,
        cex=2, type="p", pch=as.numeric(ir$Species)+15, lty=2, lwd=2, #у нас будет pch 16,17,18
        main="’арактеристики чашелистика",
        xlab="Ўирина, см", ylab="ƒлинна, см")
- dev.off()
+dev.off()
 
 #гистограмма
 hist(ir$Sepal.Length)
@@ -861,7 +863,7 @@ hist(ir$Sepal.Length)
 hist(ir$Sepal.Length, col="blue",
      main="’арактеристики чашелистика",
      xlab="ƒлинна, см", ylab=" ол-во экземпл€ров")
-#важный параметр breacks
+#важный параметр breaks
 hist(ir$Sepal.Length, breaks=50,
      col="blue", main="’арактеристики чашелистика",
       xlab="ƒлинна, см", ylab=" ол-во экземпл€ров")
