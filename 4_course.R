@@ -606,23 +606,23 @@ class(data_chick$Chick)#обратите внимание "ordered"
 
 #######День 4########################
 
-
-
 #####3 вариант - специальные функции для subseting########
+ir <- iris
+
 head(ir, n=3) #первые 3 ряда - аналогично ir[1:3,]
 tail(ir, n=2) # последние 2 ряда - аналогично ir[(nrow(ir)-1):nrow(ir),]
 head(ir$Sepal.Length, n=3) #для векторов тоже работает
 
 #subsetting по рядам с логическим сравнением
-subset(ir, (Petal.Area<6&Species=="setosa")| Species=="vers") #здесь название колонок БЕЗ КАВЫЧЕК (исключение из правила)
+subset(ir, (Sepal.Width <3 & Species=="setosa")| Species=="vers") #здесь название колонок БЕЗ КАВЫЧЕК (исключение из правила)
 
 #subset полезен если у тебя множественное сравнение, экономит место, так как не надо каждый раз писать название
 # data.frame - сравните аналог 
-ir[(ir$Petal.Area<6&ir$Species=="setosa")| ir$Species=="vers",]
+ir[(ir$Sepal.Width <3 & ir$Species=="setosa")| ir$Species=="vers",]
 
-subset(ir,Petal.Area<6, select=c(1,5)) #параметр select выбирает колонки
-ir5 <- subset(ir,Petal.Area<6, select=c("Species","Sepal.Width","Sepal.Length")) #можно и так, порядок колонок поменялся
-ir[ir$Petal.Area<6,c("Species","Sepal.Width","Sepal.Length")]
+subset(ir,Sepal.Width <3, select=c(1,5)) #параметр select выбирает колонки
+ir5 <- subset(ir,Sepal.Width <3, select=c("Species","Sepal.Width","Sepal.Length")) #можно и так, порядок колонок поменялся
+ir[ir$Sepal.Width <3,c("Species","Sepal.Width","Sepal.Length")]
 
 ####нельзя subset, head, tail слева от знака присваивания (поэтому слева только [])
 #то есть нельзя перезаписывать
@@ -631,43 +631,40 @@ subset(ir, Petal.Area<6) <- 0 #ошибка
 #последовательный subsetting
 subset(ir, Petal.Area<6)$Species [1:3] 
 
-#вид у которого разница длинной и шириной лепестка была максимальной
+#вид у которого разница длинной и шириной лепестка была максимальной, СКОБКИ ЗДЕСЬ ВАЖНЫ!
 subset(ir, (Petal.Length-Petal.Width)==max(Petal.Length-Petal.Width))$Species 
 
 # а его аналог без subset 
 ir$Species[(ir$Petal.Length-ir$Petal.Width)==max(ir$Petal.Length-ir$Petal.Width)] #очень много ir$
 
+########Cливание двух датафреймов
+###по строкам (количество колонок должно быть равно)
+
+ir1 <- ir [1:10,]
+ir2 <- ir [50:70,]
+
+ir3<-rbind(ir1, ir2) #raw bind - слияние по рядам
+
+ir[nrow(ir)+1,]<-ir[1,] #добавить 1 ряд
+
+###сливание по колонкам, по колонкам (количество строк долно быть равно)
+
+#sample - берет случайным (равновероятным) способом элементы из x 
+ir_add <- data.frame(ILL=sample(x= c(TRUE,FALSE), size = nrow(ir), replace = TRUE), 
+                     time=sample(x= seq(0,24, by=0.01), size = nrow(ir), replace = TRUE))
+
+ir<-cbind(ir,ir_add) #column bind
+
+
 
 ####минизадание:######### 
 #с помощью subset выведете на экран данные (ряд или если несколько, то ряды) 
 #из ir когда Petal.Length был минимальным
+#Создайте новый дата фрейм из этого ряда (рядов) и последних десяти рядов ir
 
 
 
- 
-#################Домашнее задание 3###########################
-data_chick<-ChickWeight #работаем снова с ней
-summary(data_chick)
-
-#1.среднеквадратичное отклонение веса всех цыплят для возраста 16, округлить до 3 знака
-
-#2. средний вес всех цыплят в возрасте 2 и с диетой не равной 3, округлить до 3 знака
-
-#3 минимальный вес цыпленка для цыплят возраста 6 и с Diet 1 или 4
-
-#4.средний вес всех цыплят в возрасте 14 и весом больше 111 ИЛИ в возрасте 20 и весом равным 199, 
-#округлить до 3 знака
-
-#5.какой номер диеты соотвествовал максимальному среднему весу цыплят в возрасте 20
-
-#6. Какой номер цыпленка (Chick) с весом максимально отклоняющемся от среднего в возрасте 8
-
-#7. максимальный (с точки зрения порядка факторов) номер (Chick) цыпленка у которого вес в каком-либо из 
-#возрастов был больше 200, но при этом вес при рождении (Time 0) был меньше 40
-
-#################День5#####################
-####Запись!
-########## Задачи с subseting (не будем рассматривать)
+######### Задачи с subseting (самостоятельно изучить)
 ######статистическая операция с результатом subsetting
 #разность средних значений ширины лепестка у двух видов
 mean(ir$Petal.Width[ir$Species=="vers"]) - mean(ir$Petal.Width[ir$Species=="setosa"])
@@ -682,45 +679,6 @@ del[(del$result-round(del$result))==0,]$del #функция round округляет до указанно
 del[(del$result-round(del$result))==0,1]
 
 
-############Загрузка и выгрузка данных#####################
-getwd() #текущая папка по умолчанию
-setwd("C:/R/Teaching/Data") #set working directory - установка папки по умолчанию
-#Обратите внимание, что здесь не прямой (как в Windows), а обратный слеш, так как прямой используется как знак деления
-
-#другой способ - использовать двойной прямой слеш
-setwd("C:\\R\\Teaching\\Data")
-
-#при загрузке или выгрузки данных, если путь к файлу не указан, то используется путь к папке по умолчанию 
-
-###загрузка csv, функция read.csv2 используется для загрузки csv "российского формата" (где разделители между колонками точки с запятой)
-films<-read.csv2(file="film.csv", dec=".") #загружает как data.frame
-#параметр dec - какой знак отделяет целые от десятичных, если у вас запятая, то надо использовать ","  
-
-films<-read.csv2(file="C:/R/Teaching/Data/film.csv", dec=".") #можно и весь путь прописать, если не в папке по умолчанию
-
-str(films) #все строковые воспринимает как факторные
-
-films<-read.csv2(file="film.csv", dec=".", stringsAsFactors = FALSE) #
-# stringsAsFactors - воспринимать ли строковые переменные как факторы
-
-str(films)
-
-#другой вариант, прописать все классы переменных вручную с помощью параметра colClasses
-films<-read.csv2(file="film.csv", dec=".", 
-  colClasses = c("integer", "integer", "character", "factor",rep("character",3),"integer","factor"))
-
-str(films)
-
-#создает новый data.frame только из комедий с наградами
-comedies<-films[films$Subject=="Comedy"&films$Awards=="Yes", ]
-
-#теперь выгружаем (сохраняем) новую data.frame на диск
-write.csv2(comedies, file="Comedies with awards.csv")
-
-##############Задание в классе######################
-#сохранить свои данные из Excel в csv(разделитель запятые), загрузить свои данные в R, 
-#сделать какой-то subseting - сохранить его в csv,
-
 
 
 ######Класс объекта list##########
@@ -730,6 +688,7 @@ data_chick<-ChickWeight #презагруженный data.frame
 chick_survey<-list(data=data_chick, authors=c("Anton", "Gosha", "Petya"), 
                    temperature=data.frame(year=c(2016:2018),temp=c(23,25,27)),
                    period="2016-2018", journal="Ecology", Citations=134) 
+
 #первый и третий элемент - data.frame, остальные вектора
 str(chick_survey)#показывает разноуровневую картину и как добраться до нужного элемент разного уровня
 
@@ -747,7 +706,7 @@ chick_survey[[authors]] #забыли кавычки
 chick_survey[[3]] # аналог, в двойный скобках только одно измерение - никаких запятых в [[]]
 
 chick_survey[[c("authors","data")]] #когда несколько названий то не работает
-chick_survey[[c(3,1)]] # так лучше тоже не делать, а лучше последовательный subseting
+
 
 #3 если одинарные скобки то выдает не элементы, а list из этих элементов
 chick_survey[2] # list из одного элемента
@@ -757,7 +716,8 @@ class(chick_survey[[2]])
 
 chick_survey[c(1,3)] #list из двух элементов
 chick_survey[c("data","temperature")] #то же самое
-chick_survey<-chick_survey[-length(chick_survey)]
+chick_survey<-chick_survey[-length(chick_survey)] #без последнего элемента
+
 #последовательный subsetting
 chick_survey[[1]] [1,3] #так как chick_survey[[1]] обычная data.frame
 a<-mean(chick_survey[[1]]$Time)
@@ -765,29 +725,40 @@ a<-mean(chick_survey[[1]]$Time)
 ##часто list сложные объекты, типа результат регрессии
 lm(data_chick$weight~data_chick$Time) #lm() - функция линейной регрессии, ~ знак зависимости
 a<-lm(data_chick$weight~data_chick$Time)
+?lm
+
 str(a) #list из 12 элементов, один из них data.frame -model
 str(a$model) #это исходные данные модели
 a$fitted.values # 
 a$coefficients
+
+#a$qr - лист 
 str(a$qr$qr)
-dimnames(a$qr$qr)[[1]]
+dimnames(a$qr$qr)[[2]] #dimnames - тоже лист
+
+
+####Минизадание####
+#выведите на экран ошибки (residuals) регрессии a
+#создайте новый лист в котором будут 2 элемента 1)эти ошибки и 2) автор модели (то есть Anton Pletenev) 
+
 ###########графики#############################
 ir<-iris
 
 ##график одной переменной
-plot(y=ir$Sepal.Length, x=1:nrow(ir))
+plot(ir$Sepal.Length) #по порядку все
 
 ##scatter plot
 plot(y=ir$Sepal.Length, x=ir$Sepal.Width)
 
 ##график из data.frame
-plot(ir)
+plot(ir) #plot - generic функция
 #plot(a)
 #вид графика
 ?plot
 plot(y=ir$Sepal.Length, x=ir$Sepal.Width, type="l")
 plot(y=ir$Sepal.Length, x=ir$Sepal.Width, type="o")
 plot(y=ir$Sepal.Length, x=ir$Sepal.Width, type="b")
+
 #название графика и осей
 #параметр main - название графика; sub - дополнительное название; xlab,ylab название осей
 plot(y=ir$Sepal.Length, x=ir$Sepal.Width, type="o",
@@ -836,8 +807,8 @@ plot(y=ir$Sepal.Length, x=ir$Sepal.Width, cex=1.5, cex.lab=1.5,cex.axis=1.5,
 #добавить еще линию
 #функция points
 points(y=ir$Petal.Length, x=ir$Petal.Width, cex=1.5,
-     type="o", pch=17, lwd=2,
-     col="darkblue") #не хватает длинны осей
+       type="o", pch=17, lwd=2,
+       col="darkblue") #не хватает длинны оси в plot
 
 #перестраиваем первый график добавляя параметры xlim и ylim в которых вектор из 2 чисел (начальное, конечное значение)
 plot(y=ir$Sepal.Length, x=ir$Sepal.Width, xlim=c(0, max(ir$Sepal.Width,ir$Petal.Width)),
@@ -852,13 +823,23 @@ points(y=ir$Petal.Length, x=ir$Petal.Width, cex=1.5, cex.lab=1.5,cex.axis=1.5,
        type="o", pch=17, lwd=2,
        col="darkblue")#теперь все ОК
 
+
+##добавить вертикальные и горизонтальные линии
+abline(h = mean(ir$Sepal.Length)) #
+abline(v = mean(ir$Sepal.Width))
+abline(v = mean(ir$Petal.Width), h = mean(ir$Petal.Length), col = "brown", lwd =2)
+#а вообще то надо вот так
+abline(v = c(mean(ir$Petal.Width), mean(ir$Sepal.Width)),
+       h = c(mean(ir$Petal.Length), mean(ir$Sepal.Length)), col = "pink", lwd =2)
+
+
 ########в качества pch, col и многих других параметров может выступать вектор равный y и x
 plot(y=ir$Sepal.Length, x=ir$Sepal.Width, col=1:nrow(ir),
      cex=1.5, type="p", pch=1:25, lty=2, lwd=2,
      main="Характеристики чашелистика",
      xlab="Ширина, см", ylab="Длинна, см")
-boxplot(ir$Sepal.Length ~ ir$Species)
-plot(ir$Sepal.Length ~ ir$Species)
+
+
 ##теперь засунем в col и pch переменную название вида
 as.numeric(ir$Species)
 plot(y=ir$Sepal.Length, x=ir$Sepal.Width, col=as.numeric(ir$Species),
@@ -877,13 +858,13 @@ plot(y=ir$Sepal.Length, x=ir$Sepal.Width, col=color,
      xlab="Ширина, см", ylab="Длинна, см")
 
 #как сохранять картинку
-setwd("C:/R/Teaching/Data") #не забываем папку по умолчанию
-png(filename="plot.png")
+
+png(filename="C:\\R\\Teaching\\plot1.png")
 
 plot(y=ir$Sepal.Length, x=ir$Sepal.Width, col=color,
-       cex=2, type="p", pch=as.numeric(ir$Species)+15, lty=2, lwd=2, #у нас будет pch 16,17,18
-       main="Характеристики чашелистика",
-       xlab="Ширина, см", ylab="Длинна, см")
+     cex=2, type="p", pch=as.numeric(ir$Species)+15, lty=2, lwd=2, #у нас будет pch 16,17,18
+     main="Характеристики чашелистика",
+     xlab="Ширина, см", ylab="Длинна, см")
 dev.off()
 
 #гистограмма
@@ -895,10 +876,82 @@ hist(ir$Sepal.Length, col="blue",
 #важный параметр breaks
 hist(ir$Sepal.Length, breaks=50,
      col="blue", main="Характеристики чашелистика",
-      xlab="Длинна, см", ylab="Кол-во экземпляров")
+     xlab="Длинна, см", ylab="Кол-во экземпляров")
+
 hist(ir$Sepal.Length, breaks=c(4,5,6,7,8),
      col="blue", main="Характеристики чашелистика",
      xlab="Длинна, см", ylab="Кол-во экземпляров")
+
+#boxplot 
+boxplot(ir$Sepal.Length ~ ir$Species)
+
+
+#################Домашнее задание 3###########################
+data_chick<-ChickWeight #работаем снова с ней
+
+
+#1.нарисовать зависимость веса от времени (scatterplot)
+
+#2. точки каждого цыпленка сделать отдельным символом 
+
+#3 нарисовать нарисовать зависимость веса от времени (scatterplot), 
+#где будут только те цыплята которые когда-либо достигли веса (или превысили) 300
+
+#4.#добавить туда линию отмечающую максимальный вес цыплят (только тех что на графики)  в возрасте 12
+
+#5. построить гистограмму распределения веса (всех цыплят) в возрасте 21
+
+#6. построить boxplot веса цыплят от диеты
+
+
+
+
+#################День5#####################
+####Запись!
+#
+
+############Загрузка и выгрузка данных#####################
+getwd() #текущая папка по умолчанию
+setwd("C:/R/Teaching/Data") #set working directory - установка папки по умолчанию
+#Обратите внимание, что здесь не прямой (как в Windows), а обратный слеш, так как прямой используется как знак деления
+
+#другой способ - использовать двойной прямой слеш
+setwd("C:\\R\\Teaching\\Data")
+
+#при загрузке или выгрузки данных, если путь к файлу не указан, то используется путь к папке по умолчанию 
+
+###загрузка csv, функция read.csv2 используется для загрузки csv "российского формата" (где разделители между колонками точки с запятой)
+films<-read.csv2(file="film.csv", dec=".") #загружает как data.frame
+#параметр dec - какой знак отделяет целые от десятичных, если у вас запятая, то надо использовать ","  
+
+films<-read.csv2(file="C:/R/Teaching/Data/film.csv", dec=".") #можно и весь путь прописать, если не в папке по умолчанию
+
+str(films) #все строковые воспринимает как факторные
+
+films<-read.csv2(file="film.csv", dec=".", stringsAsFactors = FALSE) #
+# stringsAsFactors - воспринимать ли строковые переменные как факторы
+
+str(films)
+
+#другой вариант, прописать все классы переменных вручную с помощью параметра colClasses
+films<-read.csv2(file="film.csv", dec=".", 
+  colClasses = c("integer", "integer", "character", "factor",rep("character",3),"integer","factor"))
+
+str(films)
+
+#создает новый data.frame только из комедий с наградами
+comedies<-films[films$Subject=="Comedy"&films$Awards=="Yes", ]
+
+#теперь выгружаем (сохраняем) новую data.frame на диск
+write.csv2(comedies, file="Comedies with awards.csv")
+
+##############Задание в классе######################
+#сохранить свои данные из Excel в csv(разделитель запятые), загрузить свои данные в R, 
+#сделать какой-то subseting - сохранить его в csv,
+
+
+
+
 #3D
 #устанавливаем пакеты - это надо сделать 1 раз и на всю жизнь! (ну если не сменишь компьютер и т.п)
 install.packages("fields")
@@ -982,16 +1035,7 @@ usd[date=="m"] #так как есть объект date,то он его успользует а не ir$date
 detach(ir)
 
 
-########Cливание двух датафреймов
-###по строкам (количество колонок должно быть равно)
-currency.new<-data.frame(eur=c(76.5481, 77.5541),usd=c(66.6499, 66.4318), date=c("m","t"),
-                         uah=c(23,24), eu=c(76.5481, 77.5541)/c(66.6499, 66.4318), new=NA)
-ir<-rbind(ir, currency.new) #raw bind - слияние по рядам
-ir[nrow(ir)+1,]<-ir[1,]
-ir$ffg<-1
-###по колонкам (количество строк долно быть равно)
-holidays_time<-data.frame(holidays=c(rep("w",5), "h","h"), time=c(10:16))
-currency<-cbind(ir,holidays_time) #column bind
+
 
 
 #########классы матрицы, таблицы, list#############
