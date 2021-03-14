@@ -614,11 +614,11 @@ tail(ir, n=2) # последние 2 ряда - аналогично ir[(nrow(ir)-1):nrow(ir),]
 head(ir$Sepal.Length, n=3) #для векторов тоже работает
 
 #subsetting по рядам с логическим сравнением
-subset(ir, (Sepal.Width <3 & Species=="setosa")| Species=="vers") #здесь название колонок БЕЗ КАВЫЧЕК (исключение из правила)
+subset(ir, (Sepal.Width <3 & Species=="setosa")| Species=="virginica") #здесь название колонок БЕЗ КАВЫЧЕК (исключение из правила)
 
 #subset полезен если у тебя множественное сравнение, экономит место, так как не надо каждый раз писать название
 # data.frame - сравните аналог 
-ir[(ir$Sepal.Width <3 & ir$Species=="setosa")| ir$Species=="vers",]
+ir[(ir$Sepal.Width <3 & ir$Species=="setosa")| ir$Species=="virginica",]
 
 subset(ir,Sepal.Width <3, select=c(1,5)) #параметр select выбирает колонки
 ir5 <- subset(ir,Sepal.Width <3, select=c("Species","Sepal.Width","Sepal.Length")) #можно и так, порядок колонок поменялся
@@ -626,10 +626,10 @@ ir[ir$Sepal.Width <3,c("Species","Sepal.Width","Sepal.Length")]
 
 ####нельзя subset, head, tail слева от знака присваивания (поэтому слева только [])
 #то есть нельзя перезаписывать
-subset(ir, Petal.Area<6) <- 0 #ошибка
+subset(ir, ir$Sepal.Width<6) <- 0 #ошибка
 
 #последовательный subsetting
-subset(ir, Petal.Area<6)$Species [1:3] 
+subset(ir, ir$Sepal.Width<6)$Species [1:3] 
 
 #вид у которого разница длинной и шириной лепестка была максимальной, СКОБКИ ЗДЕСЬ ВАЖНЫ!
 subset(ir, (Petal.Length-Petal.Width)==max(Petal.Length-Petal.Width))$Species 
@@ -638,7 +638,7 @@ subset(ir, (Petal.Length-Petal.Width)==max(Petal.Length-Petal.Width))$Species
 ir$Species[(ir$Petal.Length-ir$Petal.Width)==max(ir$Petal.Length-ir$Petal.Width)] #очень много ir$
 
 ########Cливание двух датафреймов
-###по строкам (количество колонок должно быть равно)
+###по строкам (количество колонок должно быть равно и названия колонок)
 
 ir1 <- ir [1:10,]
 ir2 <- ir [50:70,]
@@ -646,6 +646,7 @@ ir2 <- ir [50:70,]
 ir3<-rbind(ir1, ir2) #raw bind - слияние по рядам
 
 ir[nrow(ir)+1,]<-ir[1,] #добавить 1 ряд
+ir <- rbind(ir, ir[1,])
 
 ###сливание по колонкам, по колонкам (количество строк долно быть равно)
 
@@ -723,7 +724,7 @@ chick_survey[[1]] [1,3] #так как chick_survey[[1]] обычная data.frame
 a<-mean(chick_survey[[1]]$Time)
 
 ##часто list сложные объекты, типа результат регрессии
-lm(data_chick$weight~data_chick$Time) #lm() - функция линейной регрессии, ~ знак зависимости
+lm(data_chick$weight ~ data_chick$Time) #lm() - функция линейной регрессии, ~ знак зависимости
 a<-lm(data_chick$weight~data_chick$Time)
 ?lm
 
@@ -910,180 +911,49 @@ data_chick<-ChickWeight #работаем снова с ней
 ####Запись!
 #
 
+######пакеты#######################
+
+#install.packages("openxlsx") #в кавычках! - нужно запустить "один раз в жизни", загружает пакет из интернета
+library("openxlsx") #нужно запускать для каждой новой сессии Rstudio, загружает пакет в оперативную память
+
+#https://cran.r-project.org/web/packages/openxlsx/index.html
+#Reference manual - все функции пакета
+#Vignettes - более дружелюбное объяснение применения функций с примерами
+
 ############Загрузка и выгрузка данных#####################
 getwd() #текущая папка по умолчанию
-setwd("C:/R/Teaching/Data") #set working directory - установка папки по умолчанию
-#Обратите внимание, что здесь не прямой (как в Windows), а обратный слеш, так как прямой используется как знак деления
+setwd("C:/R/Teaching/Git/Data") #set working directory - установка папки по умолчанию
+#Обратите внимание, что здесь не прямой (как в Windows), а обратный слеш, так как прямой используется для других целей
 
 #другой способ - использовать двойной прямой слеш
-setwd("C:\\R\\Teaching\\Data")
+setwd("C:\\R\\Teaching\\Git\\Data")
 
 #при загрузке или выгрузки данных, если путь к файлу не указан, то используется путь к папке по умолчанию 
 
-###загрузка csv, функция read.csv2 используется для загрузки csv "российского формата" (где разделители между колонками точки с запятой)
-films<-read.csv2(file="film.csv", dec=".") #загружает как data.frame
-#параметр dec - какой знак отделяет целые от десятичных, если у вас запятая, то надо использовать ","  
+#####загрузка xlsx
 
-films<-read.csv2(file="C:/R/Teaching/Data/film.csv", dec=".") #можно и весь путь прописать, если не в папке по умолчанию
+films<-read.xlsx(xlsxFile = "film.xlsx") #загружает как data.frame
 
-str(films) #все строковые воспринимает как факторные
+#
+films<-read.xlsx(xlsxFile="C:/R/Teaching/Git/Data/film.xlsx") #можно и весь путь прописать, если не в папке по умолчанию
 
-films<-read.csv2(file="film.csv", dec=".", stringsAsFactors = FALSE) #
-# stringsAsFactors - воспринимать ли строковые переменные как факторы
+str(films) #все строковые воспринимает как character
 
-str(films)
+titanic<-read.xlsx(xlsxFile="C:/R/Teaching/Git/Data/film.xlsx", sheet=2) #загружаем со второго листа
 
-#другой вариант, прописать все классы переменных вручную с помощью параметра colClasses
-films<-read.csv2(file="film.csv", dec=".", 
-  colClasses = c("integer", "integer", "character", "factor",rep("character",3),"integer","factor"))
-
-str(films)
+str(titanic)
 
 #создает новый data.frame только из комедий с наградами
 comedies<-films[films$Subject=="Comedy"&films$Awards=="Yes", ]
 
 #теперь выгружаем (сохраняем) новую data.frame на диск
-write.csv2(comedies, file="Comedies with awards.csv")
+write.xlsx(comedies, file="Comedies with awards.xlsx") #! нет знака присваивания
 
 ##############Задание в классе######################
-#сохранить свои данные из Excel в csv(разделитель запятые), загрузить свои данные в R, 
-#сделать какой-то subseting - сохранить его в csv,
+#загрузить свои данные в R, 
+#сделать какой-то subseting - сохранить его в xlsx
 
-
-
-
-#3D
-#устанавливаем пакеты - это надо сделать 1 раз и на всю жизнь! (ну если не сменишь компьютер и т.п)
-install.packages("fields")
-install.packages("graphics")
-
-#загружаем пакеты в память R, нужно делать кажды раз как запускаешь R
-require(fields)
-require(graphics)
-
-image.plot(as.image(x=ir[,1:2], Z=ir$Petal.Length, nrow=16,ncol=16),#x здесь это x и y на графике, поэтому data.frame
-         col=c('royalblue1','yellow','orange','tomato','red'),xlab='Sepal.Length',ylab='Sepal.Width')
-
-
-#######минизадание#####
-#постройте графики на основе своих данных
-
-########сохранение объекта для дальнейшего использования в R
-#мы хотим сохранить объект films, чтобы заново не загружать его из csv
-##команда dput
-dput(films, file="all films")
-
-rm(list=ls()) #удаление всех объектов из памяти
-
-#dget загружает объект
-dget(file="all films")
-
-#чтобы загрузить объект надо использовать знак присвоения
-films.all<- dget(file="all films")
-
-###альтернативный способ - функции save/load. можно сразу несколько объектов, а также сложные объекты
-#которые dget/dput не берет
-levels(films.all$Subject)
-fantasy<-films.all[films.all$Subject=="Fantasy",]
-popular<-films.all[films.all$Popularity>60,]
-save(list=c("fantasy","popular"), file="fantasy_and_popular")
-
-rm(list=ls()) #удаление всех объектов из памяти
-
-load(file="fantasy_and_popular") #сразу загружает в global environment, знак присвоения не нужен
-
-
-
-
-#######ещё полезные функции чтобы не писать все время название data.frame (не )
-####with()
-ir$new<-with (ir, (eur/uah)*usd+eu) 
-with(ir, usd[usd==max(usd)])
-
-####with тоже нельзя слева
-with(ir, usd[usd==max(usd)])<-0
-
-
-#удобно в сочетании с subset
-with(subset(ir, usd>66), mean(eur/usd+34*uah)) #расчет для ситуации когда курс доллара больше 66
-#а можно так
-with(ir[ir$usd>66,], mean(eur/usd+34*uah)) 
-
-
-#фигурные скобки позволяют выполнить несколько действий в рамках with (используется и рядом других функций)
-#with(subset(ir, usd>66), {
-#print(mean(eur/usd))  #print - вывод на экран
-#print(sd(eur/usd))
-#print(max(eur/usd))
-#})
-
-####attach - отменяет необходимость писать название data.frame навсегда, пока не напишешь detach
-####количество detach должно быть равно количеству attach
-attach(ir)
-usd/eur
-usd[usd==max(usd)]
-detach(ir)
-
-usd/eur
-
-#эта функция опасна, так как
-# 1.названия некоторых объектов могут совпадать с названиями колонок data.frame
-#2.когда atach и detach далеко разнесены можно запутаться
-date<-5
-attach(ir)
-usd[date=="m"] #так как есть объект date,то он его успользует а не ir$date
-detach(ir)
-
-
-
-
-
-#########классы матрицы, таблицы, list#############
-
-######класс матрица - столбы и строки эквивалентны 
-mat<-matrix(data = c(1:600), nrow = 30, ncol = 20) #из вектора делается, фактически это вектор уложенный определенным образом  
-class(mat)
-colnames(mat)<-letters[1:20]
-rownames(mat)<-LETTERS[1:30]
-mat #букв не хватило для рядов
-names(mat) #не работает для матриц так как столбы и строки эквивалентны
-
-##subsetting похож на data.frame
-mat[c(1:3),c("a","b")]
-mat$a # не работает
-mat[mat>50] #выдает вектор
-
-##операции с матрицами
-t(mat) #транспонирование
-
-####как переделать data.frame в матрицу и наоборот - 
-data_chick<-ChickWeight
-data_chick.mat<-data.matrix(data_chick) #data.matrix из data.frame переводит в  matrix
-class(data_chick.mat)
-str(data_chick.mat)
-
-data_chick.1<-data.frame(data_chick.mat) #перевод матрицы в data.frame
-str(data_chick.1) #все перменные в data.frame стали numeric
-
-#####класс table
-sum<-summary(data_chick)
-str(sum) #не удобно работать, зато красиво
-sum
-dimnames(sum)
-sum[,1]
-
-sum1<-summary(data_chick$weight)
-str(sum1) #намного лучше, ecnm attr - names
-names(sum1)
-sum1[names(sum1)=="1st Qu."] #уже можно вытащить число
-sum1.data<-data.frame(t(matrix(sum1))) #перевод в data.frame
-names(sum1.data)<-names(sum1)
-sum1.data
-
-
-
-#######полезные функции для работы с объектами#####
-data_chick<-ChickWeight #работаем снова с ней
+#####################Полезные функции################
 
 ### unique - оставляет только уникальные значения
 unique(data_chick$Chick)
@@ -1093,42 +963,41 @@ table(c("M","T","K","M"))
 table(data_chick$Chick)
 table(data_chick [,c("Chick","Diet")]) #двойное сочетание
 tab<-table(data_chick [,c("Chick","Time")])
-str(tab) #класс table
-
-tab_chik<-table(data_chick[,c("Chick","Diet","Time")])
-tab_chik #трехмерная таблица
-str(tab_chik)
-dimnames(tab_chik)[[2]] #dimnames - это "имена измерений", является list так как вектора разной длинны
-dimnames(tab_chik)$Diet
+str(tab) #класс table, subsetting как  [] data.frame
+tab[1,2]
+tab[1,]
 
 #### paste - объедининяет множество значений в одну строковую переменную
 name<-"Anna"
 age<-17
 paste(name,"is", age,"years old", sep=" ") #sep - разделитель, в нашем случае пробел
+data_chick$ID<-paste(data_chick$Chick,data_chick$Time,sep="_")
 
+
+###with() - позволяет не писать название data.frame
 with(data_chick, paste("Maximum weight was", max(weight), "brought by chicken", Chick[weight=max(weight)],
                        "with Diet", Diet[weight=max(weight)], sep=" ")) #sep - разделитель, в нашем случае пробел
-data_chick$ID<-paste(data_chick$Chick,data_chick$Time,sep="_")
+
+
 #####минизадание: напишите фразу "Minimum weight was reached at Time ... by chicken ..." 
 
 
 ###### arrange (функция пакета plyr) сортировка data.frame по одному или нескольким столбцам
 #install.packages("plyr") #- так устанавливают пакеты - это нужно делать только один раз
-require(plyr) #так запускают пакет, который уже установлен, нужно делать каждую сессию, можно без кавычек
-library("plyr") #аналогичная функция, но менее удобная (например нельзя без кавычек)
+library("plyr") 
 
-data_chick<-arrange(data_chick, Chick) #кавычки у Chick можно не писать, заметьте, что Chick - ordered factor и сортируется по  levels
+data_chick<-arrange(data_chick, Chick) #!кавычки у Chick  не нужно писать, заметьте, что Chick - ordered factor и сортируется по  levels
 levels(data_chick$Chick) #обратите внимание сортирует согласно уровням факторной переменной
 data_chick<-arrange(data_chick, Chick, decreasing = TRUE) #параметр decreasing=TRUE если хочешь по убыванию
 data_chick<-arrange(data_chick, Diet, Chick,Time) #сначала по Diet, потом по Chick (внутри каждой Diet)
 
 ###range - расброс - min-max
-range(data_chick$weight) 
+range(data_chick$weight) #вектор из 2 значений
 
 ###diff - разность соседних элементов вектора
 data_chick_12<-data_chick[data_chick$Chick==12,]
 diff(data_chick_12$weight) #фактически это прирост
-data_chick_12$diff_weight<-c(NA,diff(data_chick_12$weight)) #0 нужен так как количество прироста на 1 меньше чем кол-во наблюдений
+data_chick_12$diff_weight<-c(NA,diff(data_chick_12$weight)) #NA нужен так как количество прироста на 1 меньше чем кол-во наблюдений
 data_chick_12
 
 #####cumsum - кумулятивная сумма
@@ -1142,26 +1011,68 @@ data_chick$Chick[which.min(data_chick$weight)] #какой цыпленок с минимальным вес
 data_chick$Chick[data_chick$weight==min(data_chick$weight)] # это аналог без использования функции - занимает больше места
 data_chick_12$Time[which.max(data_chick_12$diff_weight)] #в каком возрасте набрал максимальный вес
 
-######минизадание: в каком возрасте (кроме нуля) у цыпленка 12 была максимальная средняя скорость роста (weight/Time)
-with(subset(data_chick_12, Time!=0), Time[which.max(weight/Time)])
-###### which возвращает порядковые номера элементов которые TRUE
-which(data_chick$weight > 200)
-mean (data_chick$Time [which(data_chick$weight > 200) -1]) #средний возраст цыпленка предшествующего возрасту когда он набрал вес больше 200
+######минизадание: 
+######в каком возрасте (кроме нуля) у цыпленка 12 была максимальная средняя скорость роста (weight/Time)
 
-##### match возвращает порядковые номера 'элементов вектора B,которые совпадают с вектором A
-A<-seq(1,100,by=2)
-B<-seq(1,50,by=3)
-match(A,B) #порядковые номера A которые совпадают с каким-то из элементов из B
 
-###есть две похожие data.frame которые надо по умному слить
-data_all<-data.frame(names=c("Masha", "Gosha", "Petya", "Lesha", "Genya", "Galya","Vova", "Misha"),
-                     weight=c(50:57))
-data_frag<-data.frame(names=c("Galya", "Vova","Gosha", "Genya", "Misha"),
-                      height=seq(160,by=3,length.out=5))
+#######%>%
+#install.packages("magrittr")
+library("magrittr")
+#%>% передает в функцию слева от себя в качестве первого параметра результат функции справа от себя
 
-#надо добавить данные height из data_frag в data_all
-data_all$height<-data_frag$height[match(data_all$names,data_frag$names)]
-data_all
+data_chick<-ChickWeight
+
+head_15 <- head(subset(data_chick, Chick %in% c(16,20,21)),15)
+
+head_15 <- data_chick %>% 
+                subset(Chick %in% c(16,20,21)) %>%
+                head(15)
+
+mean_weight <- mean(subset (data_chick, Chick %in% c(16,20,21))$weight)
+
+### при subsetting точка означает объект слева от %>%
+mean_weight <- subset (data_chick, Chick %in% c(16,20,21)) %>%
+                      .$weight %>%
+                        mean()
+
+sum<- subset (data_chick, Chick %in% c(16,20,21)) %>%
+          .[1:15,2] %>%
+          sum()
+
+sq_mean_weight <- round(sqrt(mean(subset (data_chick, Chick %in% c(16,20,21))$weight[1:15])), 2) #sqrt() возвращает квадратный корень
+
+sq_mean_weight <- data_chick %>%
+                        subset (Chick %in% c(16,20,21)) %>%
+                        .$weight %>%
+                        .[1:15] %>%
+                        mean() %>%
+                        sqrt() %>%
+                        round(2) 
+
+######join - умное объединение двух data.frame
+#install.packages("dplyr")
+library("dplyr")
+
+info <- data.frame(Chick = factor(c(18,15), levels = levels(data_chick$Chick), ordered = TRUE), 
+                   DEAD = TRUE, age_of_death = c(20,35))
+
+#мы хотим добавить эту информацию в наш data.frame
+
+data_chick <- left_join (data_chick, info)
+
+info2 <- data.frame(Chick = factor(15, levels = levels(data_chick$Chick), ordered = TRUE), 
+                    Time = c(0, 4, 16, 30, 45),
+                   height = c(1,3,5,6,9), color = c(rep("yellow",3), rep("red",2)))
+
+unique(data_chick$Time)
+
+data_chick <- left_join (data_chick, info2)
+
+
+####минизадание 
+#добавьте информацию в data_chick что все циплята которые получали диету 4 в возрасте 2 были глухими
+
+
 
 #################Задание в классе 3###########################
 data_plant<-CO2 #данные - концентрация CO2 (conc) и сколько потребило растение
