@@ -949,12 +949,40 @@ comedies<-films[films$Subject=="Comedy"&films$Awards=="Yes", ]
 #теперь выгружаем (сохраняем) новую data.frame на диск
 write.xlsx(comedies, file="Comedies with awards.xlsx") #! нет знака присваивания
 
+
+
+#######csv####################
+###загрузка csv, функция read.csv2 используется для загрузки csv "российского формата" (где разделители между колонками точки с запятой)
+films<-read.csv2(file="film.csv", dec=".") #загружает как data.frame
+#параметр dec - какой знак отделяет целые от десятичных, если у вас запятая, то надо использовать ","  
+
+films<-read.csv2(file="C:/R/Teaching/Data/film.csv", dec=".") #можно и весь путь прописать, если не в папке по умолчанию
+
+str(films) #все строковые воспринимает как факторные
+
+films<-read.csv2(file="film.csv", dec=".", stringsAsFactors = FALSE) #
+# stringsAsFactors - воспринимать ли строковые переменные как факторы
+
+str(films)
+
+#другой вариант, прописать все классы переменных вручную с помощью параметра colClasses
+films<-read.csv2(file="film.csv", dec=".", 
+                 colClasses = c("integer", "integer", "character", "factor",rep("character",3),"integer","factor"))
+
+str(films)
+
+#создает новый data.frame только из комедий с наградами
+comedies<-films[films$Subject=="Comedy"&films$Awards=="Yes", ]
+
+#теперь выгружаем (сохраняем) новую data.frame на диск
+write.csv2(comedies, file="Comedies with awards.csv")
+
 ##############Задание в классе######################
 #загрузить свои данные в R, 
 #сделать какой-то subseting - сохранить его в xlsx
 
 #####################Полезные функции################
-
+data_chick<-ChickWeight
 ### unique - оставляет только уникальные значения
 unique(data_chick$Chick)
 
@@ -966,7 +994,7 @@ tab<-table(data_chick [,c("Chick","Time")])
 str(tab) #класс table, subsetting как  [] data.frame
 tab[1,2]
 tab[1,]
-
+tab_data<- as.data.frame(tab)
 #### paste - объедининяет множество значений в одну строковую переменную
 name<-"Anna"
 age<-17
@@ -975,10 +1003,10 @@ data_chick$ID<-paste(data_chick$Chick,data_chick$Time,sep="_")
 
 
 ###with() - позволяет не писать название data.frame
-with(data_chick, paste("Maximum weight was", max(weight), "brought by chicken", Chick[weight=max(weight)],
-                       "with Diet", Diet[weight=max(weight)], sep=" ")) #sep - разделитель, в нашем случае пробел
+with(data_chick, paste("Maximum weight was", max(weight), "brought by chicken", Chick[weight==max(weight)],
+                       "with Diet", Diet[weight==max(weight)], sep=" ")) #sep - разделитель, в нашем случае пробел
 
-
+with(data_chick, weight[1:2]) #аналог data_chick$weight[1:2]
 #####минизадание: напишите фразу "Minimum weight was reached at Time ... by chicken ..." 
 
 
@@ -1010,7 +1038,7 @@ which.min(data_chick$weight)
 data_chick$Chick[which.min(data_chick$weight)] #какой цыпленок с минимальным весом
 data_chick$Chick[data_chick$weight==min(data_chick$weight)] # это аналог без использования функции - занимает больше места
 data_chick_12$Time[which.max(data_chick_12$diff_weight)] #в каком возрасте набрал максимальный вес
-
+which.min(data_chick$weight-(data_chick$weight)^2)
 ######минизадание: 
 ######в каком возрасте (кроме нуля) у цыпленка 12 была максимальная средняя скорость роста (weight/Time)
 
@@ -1019,8 +1047,6 @@ data_chick_12$Time[which.max(data_chick_12$diff_weight)] #в каком возрасте набра
 #install.packages("magrittr")
 library("magrittr")
 #%>% передает в функцию слева от себя в качестве первого параметра результат функции справа от себя
-
-data_chick<-ChickWeight
 
 head_15 <- head(subset(data_chick, Chick %in% c(16,20,21)),15)
 
@@ -1047,7 +1073,7 @@ sq_mean_weight <- data_chick %>%
                         .[1:15] %>%
                         mean() %>%
                         sqrt() %>%
-                        round(2) 
+                        round(digits=2) 
 
 ######join - умное объединение двух data.frame
 #install.packages("dplyr")
